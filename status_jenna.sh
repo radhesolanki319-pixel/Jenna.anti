@@ -58,6 +58,13 @@ fi
 CONV_COUNT=$(ls -1 /storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna/data/conversations/*.json 2>/dev/null | wc -l)
 echo "  🧠 Zero-Amnesia: 🟢 ACTIVE ($CONV_COUNT User Logs Persisted on Disk)"
 
+# Touch-Adaptive 144Hz / 60Hz Governor
+if pgrep -f "touch_adaptive_refresh_daemon.py" >/dev/null 2>&1; then
+    echo "  ⚡ 144Hz Touch:  🟢 ACTIVE (Touch: 144Hz | Idle: 60Hz)"
+else
+    echo "  ⚡ 144Hz Touch:  🔴 STOPPED"
+fi
+
 # Live Vision Daemon
 if pgrep -f "run_live_vision_daemon.py" >/dev/null 2>&1; then
     echo "  👁️ Live Vision:  🟢 ACTIVE (Continuous Screen Watcher)"
