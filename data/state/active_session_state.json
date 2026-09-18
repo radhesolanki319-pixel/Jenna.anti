@@ -1,28 +1,26 @@
 {
-  "checkpoint_time": "2026-09-18T12:46:30.000000+00:00",
+  "checkpoint_time": "2026-09-18T13:04:24.922521+00:00",
   "status": "HEALTHY",
-  "device_profile": {
-    "model": "iQOO Neo 10 (I2405 / I2405i)",
-    "soc": "Qualcomm Snapdragon 8 Gen 4 (SM8750 'sun' Oryon Architecture)",
-    "os": "Android 15 (OriginOS / FuntouchOS)",
-    "screen": "1260 x 2800 8T LTPO AMOLED @ 144 Hz",
-    "touch_driver": "/dev/input/event5 (vivo_ts)",
-    "cooling": "144Hz Touch / 60Hz Idle Dynamic Governor + Direct Hardware Bypass Charging"
+  "battery": {
+    "present": true,
+    "technology": "Li-poly",
+    "health": "GOOD",
+    "plugged": "UNPLUGGED",
+    "status": "DISCHARGING",
+    "temperature": 44.7,
+    "voltage": 3615,
+    "current": -554000,
+    "current_average": -725667,
+    "percentage": 15,
+    "level": 15,
+    "scale": 100,
+    "charge_counter": 448000,
+    "cycle": 340
   },
-  "user_addressing_rule": "Strictly address as baby, babe, or sweetheart. NEVER use jaan or meri jaan. Never use bhai/bro/sir.",
+  "uptime_seconds": 251027.961268196,
   "active_services": {
-    "fastapi": "http://127.0.0.1:8000 (23 routers, 34 autonomous tools)",
-    "nextjs_web": "http://127.0.0.1:3001 (Web Companion UI)",
-    "whatsapp_bridge": "http://127.0.0.1:3000 (Connected to +91 7610543733)",
-    "whatsapp_daemon": "ACTIVE (Autonomous Antigravity Agent)",
-    "proactive_sentinel": "ACTIVE (Thermal, Battery & State Sentinel)",
-    "touch_adaptive_144hz_governor": "ACTIVE (Pipe latency: 0.03ms | Debounce: 50ms)",
-    "zero_amnesia_memory": "ACTIVE (Persistent JSON & JSONL stores in data/conversations/)"
-  },
-  "permanent_autostart": {
-    "termux_boot": "~/.termux/boot/start_jenna.sh",
-    "bashrc_recovery": "~/.bashrc auto-heal hook",
-    "git_version_control": "Committed and tracked locally"
-  },
-  "latest_completed_task": "Upgraded touch-adaptive governor with persistent shell pipe and 50ms debounce for instant 144Hz <-> 60Hz switching. Saved entire conversation history to disk."
+    "fastapi": "http://127.0.0.1:8000",
+    "nextjs_web": "http://127.0.0.1:3001",
+    "whatsapp_bridge": "http://127.0.0.1:3000"
+  }
 }
