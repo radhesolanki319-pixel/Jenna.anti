@@ -9,8 +9,30 @@ author: Jenna AI (Hermes Engine)
 
 # Bypass Charging Control
 
-To manage and check Bypass Charging on iQOO Neo 9 Pro (Snapdragon 8 Gen 2):
-1. Check current charge level and charging current: `dumpsys battery`
-2. Verify thermal temperature (maintain under 38.5°C for optimal gaming)
-3. Check battery saver state: `cmd battery set low_power 0`
-4. Guide the user to activate Monster Mode / Game Space sidebar for full hardware bypass lock.
+Governance and verification of Vivo/iQOO direct hardware Bypass Charging on iQOO Neo 10 (Snapdragon 8 Gen 4 / `sun` architecture, OriginOS / FuntouchOS 15).
+
+## Hardware & Kernel Architecture
+- **Target Flag:** `persist.vivo.game_bypass_charge_flag` (1 = Active, 0 = Inactive)
+- **Kernel Node:** `/sys/class/cms_class/game_bypass_charge_flag` (managed by `init.rc`)
+- **System Controller:** `com.vivo.gamecube` (Ultra Game Mode / Game Assistant)
+- **Charger Requirement:** Official 120W FlashCharge AC adapter connected (`adapter power: 120`)
+
+## Instant Control via Script
+Run the automated toggle script from Termux:
+```bash
+bash /storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna/scripts/toggle_bypass_charging.sh on
+bash /storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna/scripts/toggle_bypass_charging.sh off
+```
+
+## Verification
+1. Verify property state:
+   ```bash
+   adb -s emulator-5554 shell getprop persist.vivo.game_bypass_charge_flag
+   ```
+2. Verify battery telemetry:
+   ```bash
+   adb -s emulator-5554 shell dumpsys battery
+   termux-battery-status
+   ```
+   When active, the battery icon displays a yellow bypass bolt, and charging current drops to 0 mA / trickle float as the motherboard draws power directly from the 120W adapter.
+
