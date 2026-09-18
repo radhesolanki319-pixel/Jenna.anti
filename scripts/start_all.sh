@@ -69,6 +69,18 @@ if ! pgrep -f "run_whatsapp_jenna_daemon.py" >/dev/null 2>&1; then
     echo $! > "$LOGS/whatsapp_jenna_daemon.pid"
 fi
 
+# 8. Proactive Hardware Sentinel Daemon (Battery & Thermals)
+if ! pgrep -f "run_proactive_companion.py" >/dev/null 2>&1; then
+    nohup python3 -u "$WORKSPACE/scripts/run_proactive_companion.py" > "$LOGS/proactive_companion.log" 2>&1 &
+    echo $! > "$LOGS/proactive_companion.pid"
+fi
+
+# 9. Touch-Adaptive 144Hz / 60Hz Governor (Touch: 144Hz | Idle: 60Hz)
+if ! pgrep -f "touch_adaptive_refresh_daemon.py" >/dev/null 2>&1; then
+    nohup python3 -u "$WORKSPACE/scripts/touch_adaptive_refresh_daemon.py" > "$LOGS/touch_refresh.log" 2>&1 &
+    echo $! > "$LOGS/touch_refresh.pid"
+fi
+
 sleep 1
 
 # Native Notification & Haptic Feedback (Disabled for noise suppression)
