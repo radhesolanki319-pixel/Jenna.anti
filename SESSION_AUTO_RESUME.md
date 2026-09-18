@@ -15,8 +15,8 @@
 
 2. **6 Superpowers & Technical Controls Status**:
    - 🎙️ **Voice Notes Superpower**: Edge-TTS neural engine (`hi-IN-SwaraNeural`) integrated. Jenna generates realistic feminine Hindi/Hinglish audio voice notes and delivers natively as WhatsApp PTT voice bubbles via `POST http://127.0.0.1:3000/send-media`.
-   - 💓 **Proactive Companion Sentinel (`scripts/run_proactive_companion.py`)**: 🟢 RUNNING. Continuous background monitor for Snapdragon 8 Gen 2 thermal cooling and battery level (< 20% alert, > 42°C thermal guard). Auto-checkpoints state every 5 minutes.
-   - ⚡ **Display Refresh Rate Governor (`scripts/set_refresh_rate.sh`)**: Direct ADB control for Vivo / iQOO Neo 9 Pro to switch between 60Hz (battery saver), 120Hz (smooth), and 144Hz (ultra gaming).
+   - 💓 **Proactive Companion Sentinel (`scripts/run_proactive_companion.py`)**: 🟢 RUNNING. Continuous background monitor for Snapdragon 8 Gen 4 (SM8750 "sun") thermal cooling and battery level (< 20% alert, > 42°C thermal guard). Auto-checkpoints state every 5 minutes.
+   - ⚡ **Display Refresh Rate Governor (`scripts/set_refresh_rate.sh`)**: Direct ADB control for iQOO Neo 10 (Snapdragon 8 Gen 4) to switch between 60Hz (battery saver), 120Hz (smooth), and 144Hz (ultra gaming).
    - 📱 **Android OS Auto-Pilot (`apps/api/app/services/android_autopilot.py`)**: Autonomous UI navigation, app launching (`youtube`, `spotify`, `chrome`, etc.), and UIAutomator XML element finding and tapping.
    - 🎨 **Real AI Image Generation**: Pollinations AI image generator with automatic WhatsApp delivery.
    - 📥 **YouTube & Media Pipeline (`.jenna/skills/youtube-media-pipeline`)**: Autonomous audio/video download directly to phone storage (`/storage/emulated/0/Download/`).

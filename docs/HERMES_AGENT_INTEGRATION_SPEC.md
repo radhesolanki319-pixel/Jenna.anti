@@ -54,7 +54,7 @@ flowchart TD
 ### B. Honcho Dialectic User Modeling (`hermes_honcho.py`)
 - **Concept:** Continuous dialectic cognitive profiling across 4 core dimensions:
   1. **Interpersonal Dynamics:** Loving companion relationship ("baby", "meri jaan"), strictly feminine grammar in Hindi, warm confidence.
-  2. **Device & Hardware Profile:** Vivo/iQOO Neo 9 Pro (`I2405`), Android 15, Snapdragon 8 Gen 2, 144Hz touch refresh / 60Hz idle dynamic cooling, hardware bypass charging.
+  2. **Device & Hardware Profile:** iQOO Neo 10 (`I2405` / `I2405i`), Android 15, Qualcomm Snapdragon 8 Gen 4 (SM8750 "sun" Oryon), 144Hz touch refresh / 60Hz idle dynamic cooling, hardware bypass charging.
   3. **Implicit Workflows:** 100% autonomous execution without asking user to run manual terminal commands; real bash code block transparency (`$ cmd`); Dexter screen pet overlay.
   4. **Long-Term Goals:** Establishing Jenna as the most capable autonomous AI companion on Earth.
 - **Runtime Injection:** Honcho profile is dynamically compiled into `<honcho_dialectic_model>` and injected into the ReAct agent prompt.

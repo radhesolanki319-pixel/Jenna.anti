@@ -1,6 +1,6 @@
 """Jenna Dynamic Touch-Adaptive 144Hz / 60Hz Refresh Rate Daemon.
 
-Vivo / iQOO Neo 9 Pro (Snapdragon 8 Gen 2 / Android 15)
+iQOO Neo 10 (Snapdragon 8 Gen 4 / SM8750 "sun" / Android 15)
 - Touch Down (finger on screen): Instantly locks display to 144.0 Hz.
 - Finger Lifted (screen idle): Immediately drops display to 60.0 Hz after kinetic debounce.
 Result: 100% silky 144Hz flagship feel during touch, 60Hz power saving when idle.

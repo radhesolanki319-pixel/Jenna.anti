@@ -1,5 +1,5 @@
 {
-  "checkpoint_time": "2026-09-18T11:42:42.710992+00:00",
+  "checkpoint_time": "2026-09-18T12:28:36.714258+00:00",
   "status": "HEALTHY",
   "battery": {
     "present": true,
@@ -7,17 +7,17 @@
     "health": "GOOD",
     "plugged": "UNPLUGGED",
     "status": "DISCHARGING",
-    "temperature": 37.3,
-    "voltage": 3744,
-    "current": -367000,
-    "current_average": -532699,
-    "percentage": 30,
-    "level": 30,
+    "temperature": 38.1,
+    "voltage": 3689,
+    "current": -314000,
+    "current_average": -376629,
+    "percentage": 24,
+    "level": 24,
     "scale": 100,
-    "charge_counter": 867000,
+    "charge_counter": 701000,
     "cycle": 340
   },
-  "uptime_seconds": 246125.672932827,
+  "uptime_seconds": 248880.222220474,
   "active_services": {
     "fastapi": "http://127.0.0.1:8000",
     "nextjs_web": "http://127.0.0.1:3001",

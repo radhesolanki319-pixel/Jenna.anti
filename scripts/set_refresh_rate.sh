@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ==============================================================================
-# Vivo / iQOO Neo 9 Pro Display Refresh Rate Governor (60Hz / 120Hz / 144Hz)
+# iQOO Neo 10 Display Refresh Rate Governor (Snapdragon 8 Gen 4 / 60Hz - 144Hz)
 # ==============================================================================
 
 MODE="${1:-status}"
