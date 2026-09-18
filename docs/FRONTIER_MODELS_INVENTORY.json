@@ -1,0 +1,76 @@
+{
+  "title": "Frontier AI Models Master Registry",
+  "archived_at": "2026-09-16T18:21:00Z",
+  "project": "Jenna Personal AI Platform",
+  "models": {
+    "claude_fable_5_1": {
+      "name": "Claude Fable 5.1",
+      "provider": "Anthropic",
+      "release_date": "2026-09-01",
+      "architecture_class": "Mythos",
+      "access_type": "General Availability (Public & Enterprise)",
+      "economic_breakthrough": "75% cheaper prompt cache reads, reducing long-horizon agent costs by up to 45%",
+      "core_capabilities": [
+        "Multi-day long-horizon autonomous workflows without context drift",
+        "Autonomous introspective failure recovery & self-healing",
+        "Whole-codebase refactoring spanning hundreds of modules across distributed repos",
+        "Self-written unit testing, end-to-end regression validation, and automated PR reviews",
+        "Enterprise Frontier Safeguards (EFS) with customer-controlled private VPC data retention"
+      ],
+      "supported_platforms": [
+        "Claude API",
+        "Amazon Bedrock",
+        "Google Cloud Vertex AI",
+        "Microsoft Foundry"
+      ],
+      "jenna_integration_role": "Deep Architecture, Massive Codebase Refactoring & Long-Horizon Research Engine"
+    },
+    "gpt_6_astra": {
+      "name": "GPT-6 Astra",
+      "provider": "OpenAI",
+      "release_date": "2026-09-03",
+      "architecture_class": "Frontier Multimodal Agent Matrix",
+      "safety_milestone": "First OpenAI model to achieve 'Critical' cybersecurity rating under Preparedness Framework",
+      "family_variants": [
+        {
+          "variant": "GPT-6 Astra Max",
+          "purpose": "Heavy deep reasoning, complex multi-step planning, high-tier mathematical proofs"
+        },
+        {
+          "variant": "GPT-6 Astra Low",
+          "purpose": "Ultra-low latency real-time interactions, fast chat, rapid operational actions"
+        }
+      ],
+      "core_capabilities": [
+        "Native OS-Level Computer Use: Visual UI coordinate detection, mouse clicking/dragging, keyboard typing, form filling",
+        "Cybersecurity & Autonomous Exploit Mitigation: Zero-day vulnerability detection, memory safety enforcement, runtime stack trace triage",
+        "3D Modeling & CAD Engineering: Blender Python (bpy) generation, Unreal Engine 5 blueprint pipelines, parametric CAD modeling",
+        "Physical Simulations: Navier-Stokes fluid approximations, aerodynamic airflow modeling",
+        "Tier-4 Frontier Reasoning & Mathematics: Abstract ARC benchmarks zero-shot, research-grade proofs, econometric projections",
+        "Zero-Amnesia Context Engine: Eradicates reasoning loops and repetitive failure patterns"
+      ],
+      "supported_platforms": [
+        "OpenAI API",
+        "Microsoft Foundry",
+        "Amazon Bedrock"
+      ],
+      "jenna_integration_role": "Visual UI Computer-Use, Security Audits, 3D/CAD Engine & Advanced Mathematical Proofs"
+    },
+    "google_antigravity": {
+      "name": "Google Antigravity (AGY)",
+      "provider": "Google DeepMind",
+      "architecture_class": "Advanced Agentic Coding Platform",
+      "core_capabilities": [
+        "Autonomous ReAct coding loop with self-healing",
+        "Multi-agent swarm orchestration (invoke_subagent, define_subagent)",
+        "Surgical file patching (replace_file_content)",
+        "Terminal daemon manager with millisecond hybrid threshold",
+        "Reactive scheduling with zero-CPU wakeups",
+        "Model Context Protocol (MCP) JSON-RPC gateway",
+        "Headless browser automation and web scraping",
+        "Native Android/Termux hardware execution (144Hz/60Hz, thermals, Dexter overlay pet)"
+      ],
+      "jenna_integration_role": "Primary Native Host OS, Android System Controller, Hardware Tuner & Screen Pet Master"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+from app.routers import (
+    agents,
+    ai,
+    android,
+    app_usage,
+    approvals,
+    audit,
+    auth,
+    conversations,
+    devices,
+    health,
+    improvement,
+    memory,
+    notifications,
+    production,
+    settings,
+    system,
+    tools,
+    usage,
+    vision,
+    voice,
+    websocket,
+)
+
+__all__ = [
+    "agents",
+    "ai",
+    "android",
+    "app_usage",
+    "approvals",
+    "audit",
+    "auth",
+    "conversations",
+    "devices",
+    "health",
+    "improvement",
+    "memory",
+    "notifications",
+    "production",
+    "settings",
+    "system",
+    "tools",
+    "usage",
+    "vision",
+    "voice",
+    "websocket",
+]
+
+
+
+

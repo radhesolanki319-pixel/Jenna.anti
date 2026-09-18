@@ -1,0 +1,6 @@
+name: smart-app-launcher
+description: Uses Android accessibility or UI inspector to locate, tap, and launch installed apps or shortcuts.
+instructions: |
+  1. Use inspect_screen to capture current UI layout.
+  2. Locate target app icon using text or visual features.
+  3. Use point_on_screen and touch events to open target app.

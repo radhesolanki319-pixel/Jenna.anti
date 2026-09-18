@@ -1,0 +1,6 @@
+name: daily-custom-automation
+description: Executes user-defined scheduled custom routines, background cleanups, and git backups automatically.
+instructions: |
+  1. Pull latest status of active project workspace.
+  2. Run git status and auto-commit routine backups.
+  3. Execute user custom scripts stored in workspace scripts directory.

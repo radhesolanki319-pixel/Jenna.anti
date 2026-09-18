@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- Outer Glow -->
+    <path
+        android:fillColor="#22FF2B85"
+        android:pathData="M48,48m-44,0a44,44 0,1,1 88,0a44,44 0,1,1 -88,0" />
+    <!-- Cat Head -->
+    <path
+        android:fillColor="#FF12101A"
+        android:strokeColor="#FFFF2B85"
+        android:strokeWidth="2.5"
+        android:pathData="M24,70 L24,40 L34,22 L42,35 L54,35 L62,22 L72,40 L72,70 Z" />
+    <!-- Sunglasses / Cyber Visor -->
+    <path
+        android:fillColor="#FF00F5D4"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M28,45 L44,45 L42,55 L30,55 Z" />
+    <path
+        android:fillColor="#FF00F5D4"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M52,45 L68,45 L66,55 L54,55 Z" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M44,49 L52,49" />
+    <!-- Collar -->
+    <path
+        android:strokeColor="#FFFF2B85"
+        android:strokeWidth="3"
+        android:pathData="M30,68 L66,68" />
+</vector>

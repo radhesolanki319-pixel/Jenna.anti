@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: jenna-web
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - jenna-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: jenna-api
+    ports:
+      - '8000:8000'
+    environment:
+      - APP_ENV=${APP_ENV:-development}
+      - APP_SECRET=${APP_SECRET:-change-me-in-production}
+      - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-jenna}:${POSTGRES_PASSWORD:-jenna_secret}@postgres:5432/${POSTGRES_DB:-jenna_db}
+      - REDIS_URL=redis://redis:6379/0
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import httpx; r = httpx.get("http://localhost:8000/api/v1/health"); assert r.status_code == 200']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - jenna-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: jenna-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-jenna}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-jenna_secret}
+      - POSTGRES_DB=${POSTGRES_DB:-jenna_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-jenna} -d ${POSTGRES_DB:-jenna_db}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jenna-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: jenna-redis
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jenna-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  jenna-network:
+    driver: bridge

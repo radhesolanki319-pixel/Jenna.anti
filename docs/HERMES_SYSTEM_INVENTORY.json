@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Hermes Agent Superpowers Inventory for Jenna AI",
+  "version": "1.0.0",
+  "release_date": "2026-09",
+  "origin_architecture": "Nous Research Hermes Agent (Feb 2026)",
+  "standard_compatibility": "https://agentskills.io",
+  "tools": [
+    {
+      "name": "learn_skill",
+      "description": "Synthesizes and permanently stores a new procedural skill into the agentskills.io library",
+      "parameters": {
+        "name": "string (kebab-case)",
+        "description": "string",
+        "instructions": "string (markdown)",
+        "tags": "array of strings"
+      }
+    },
+    {
+      "name": "list_skills",
+      "description": "Returns full catalogue of all self-learned and foundational skills",
+      "parameters": {}
+    },
+    {
+      "name": "execute_skill",
+      "description": "Loads a saved skill's SKILL.md instructions for execution",
+      "parameters": {
+        "name": "string (skill slug)"
+      }
+    },
+    {
+      "name": "get_user_profile",
+      "description": "Fetches the 4-dimension Honcho dialectic user cognitive profile",
+      "parameters": {}
+    },
+    {
+      "name": "update_user_profile",
+      "description": "Updates or enriches a Honcho cognitive dimension",
+      "parameters": {
+        "dimension": "string",
+        "key": "string",
+        "value": "any"
+      }
+    },
+    {
+      "name": "broadcast_message",
+      "description": "Dispatches messages across Telegram, Discord, and Android Dexter bubble",
+      "parameters": {
+        "message": "string",
+        "platforms": "optional array of strings"
+      }
+    }
+  ],
+  "cognitive_profile_dimensions": [
+    "interpersonal_dynamics",
+    "device_hardware_profile",
+    "implicit_workflows",
+    "long_term_goals"
+  ],
+  "messaging_gateways": [
+    "web_chat",
+    "telegram",
+    "discord",
+    "whatsapp",
+    "android_dexter",
+    "webhook"
+  ],
+  "api_endpoints": [
+    "GET /api/v1/antigravity/hermes/skills",
+    "POST /api/v1/antigravity/hermes/skills",
+    "GET /api/v1/antigravity/hermes/skills/{name}",
+    "GET /api/v1/antigravity/hermes/honcho",
+    "POST /api/v1/antigravity/hermes/honcho",
+    "GET /api/v1/antigravity/hermes/gateway",
+    "POST /api/v1/antigravity/hermes/gateway/broadcast",
+    "GET /api/v1/antigravity/hermes/mcp/tools"
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "project": "Jenna Personal AI Platform",
+  "target_version": "3.0.0-antigravity-native",
+  "specification_name": "Google Antigravity Complete Architectural Inventory",
+  "created_at": "2026-09-16T18:06:00Z",
+  "trigger_command": "yeh sab jenna ke ander daalna",
+  "total_subsystems": 11,
+  "total_core_tools": 17,
+  "total_slash_commands": 8,
+  "subsystems": {
+    "1_autonomous_react_core": {
+      "name": "Autonomous ReAct Agentic Loop",
+      "description": "Infinite multi-turn autonomous execution cycle without manual user intervention",
+      "components": [
+        "Think-Plan-Act-Observe-SelfCorrect Cycle",
+        "Dynamic Context Window Auto-Compaction",
+        "Automated Error Reflection and Code Stack Trace Debugger",
+        "Zero-Amnesia Memory Anchor Bus"
+      ],
+      "status": "SAVED"
+    },
+    "2_multi_agent_swarm": {
+      "name": "Multi-Agent Swarm Orchestrator",
+      "description": "Concurrent background subagent dispatching, specialized role creation, and inter-agent communication",
+      "tools": [
+        {
+          "tool_name": "invoke_subagent",
+          "purpose": "Dispatch parallel subagents with custom models (inherit, flash, flash_lite, pro) and workspace isolation (inherit, branch, share)"
+        },
+        {
+          "tool_name": "define_subagent",
+          "purpose": "Dynamically create and register specialized subagent types at runtime with scoped system prompts and tool access"
+        },
+        {
+          "tool_name": "manage_subagents",
+          "purpose": "List active subagents, monitor execution status, and kill specific or all subagent trees"
+        },
+        {
+          "tool_name": "send_message",
+          "purpose": "Direct peer-to-peer and parent-to-child agent asynchronous message transport"
+        }
+      ],
+      "status": "SAVED"
+    },
+    "3_code_navigation_and_patching": {
+      "name": "Surgical Code Navigation and Safe Patching Engine",
+      "description": "Multi-file chunk replacement, safe creation, and high-speed indexing",
+      "tools": [
+        {
+          "tool_name": "replace_file_content",
+          "purpose": "Surgical chunk replacement with exact line ranges, target matching, and lint ID association"
+        },
+        {
+          "tool_name": "write_to_file",
+          "purpose": "Atomic file creation with automatic recursive parent directory generation"
+        },
+        {
+          "tool_name": "view_file",
+          "purpose": "Chunked text and binary streaming viewer with byte offset pagination"
+        },
+        {
+          "tool_name": "grep_search",
+          "purpose": "Ultra-fast ripgrep pattern matching with include/exclude globs and line snippets"
+        },
+        {
+          "tool_name": "find_by_name",
+          "purpose": "High-velocity fd file and directory discovery with glob filtering"
+        },
+        {
+          "tool_name": "list_dir",
+          "purpose": "Structured directory tree hierarchy scanner"
+        }
+      ],
+      "status": "SAVED"
+    },
+    "4_terminal_and_task_daemon": {
+      "name": "Terminal Execution, Sandbox & Daemon Manager",
+      "description": "Hybrid synchronous/asynchronous command runner with persistent shell state and background logging",
+      "tools": [
+        {
+          "tool_name": "run_command",
+          "purpose": "Execute shell commands with millisecond async threshold, persistent terminal reuse, and sandbox policies"
+        },
+        {
+          "tool_name": "manage_task",
+          "purpose": "Track running background processes, stream task logs, send STDIN input, and manage process lifecycles"
+        }
+      ],
+      "status": "SAVED"
+    },
+    "5_reactive_scheduling_and_cron": {
+      "name": "Reactive Scheduling & Autonomous Cron Engine",
+      "description": "Zero-CPU event-driven timers and recurring crons",
+      "tools": [
+        {
+          "tool_name": "schedule",
+          "purpose": "One-shot timers with conditional early termination (never, any, task_id) and recurring 5-field cron jobs"
+        }
+      ],
+      "status": "SAVED"
+    },
+    "6_customization_ecosystem": {
+      "name": "Antigravity Customization Framework",
+      "description": "Skills, rules, plugins, hooks, and sidecars architecture",
+      "components": [
+        "Skills Architecture (SKILL.md with YAML frontmatter, progressive disclosure, scripts, and references)",
+        "Hierarchical Rules Engine (GEMINI.md, AGENTS.md, .agents/rules/*.md)",
+        "Lifecycle Event Hooks (hooks.json with pre-tool, post-tool, and error interceptors)",
+        "Plugin Bundles (plugins/<name>/plugin.json)",
+        "Sidecar Companion Daemons"
+      ],
+      "status": "SAVED"
+    },
+    "7_model_context_protocol": {
+      "name": "Model Context Protocol (MCP) Client",
+      "description": "Standard JSON-RPC 2.0 open protocol bridge to external tool providers",
+      "components": [
+        "mcp_config.json server registration",
+        "stdio and SSE transport mechanisms",
+        "Dynamic tool discovery and resource binding"
+      ],
+      "status": "SAVED"
+    },
+    "8_web_intelligence_and_browser": {
+      "name": "Web Intelligence & Browser Automation Engine",
+      "description": "Fast markdown conversion, real-time web search, and headless browser navigation",
+      "tools": [
+        {
+          "tool_name": "read_url_content",
+          "purpose": "High-speed clean HTML-to-Markdown scraper without JavaScript overhead"
+        },
+        {
+          "tool_name": "search_web",
+          "purpose": "Real-time web search with domain ranking and snippet synthesis"
+        }
+      ],
+      "components": [
+        "Headless Chromium automation engine for clicking, typing, and screenshots"
+      ],
+      "status": "SAVED"
+    },
+    "9_brain_and_artifacts": {
+      "name": "Brain, Artifacts & Visual Generation Engine",
+      "description": "Interactive markdown documents, architectural diagrams, and image synthesis",
+      "tools": [
+        {
+          "tool_name": "generate_image",
+          "purpose": "AI UI mockup and asset synthesis with custom aspect ratios"
+        }
+      ],
+      "components": [
+        "Brain directory storage (<appDataDir>/brain/<id>)",
+        "Mermaid Diagram Engine (Flowcharts, Sequences, States, ERDs, XY Charts)",
+        "Interactive Before/After Code Carousels",
+        "Artifact Metadata and User Feedback Request Bus"
+      ],
+      "status": "SAVED"
+    },
+    "10_interactive_decision_modals": {
+      "name": "Interactive Decision Modal Engine",
+      "description": "Structured UI modals for requirements clarification and architectural design decisions",
+      "tools": [
+        {
+          "tool_name": "ask_question",
+          "purpose": "Renders interactive UI modal with single-select, multi-select checkboxes, and write-in fallbacks"
+        }
+      ],
+      "status": "SAVED"
+    },
+    "11_slash_commands_suite": {
+      "name": "Slash Commands Workflow Suite",
+      "description": "Pre-built high-leverage agent workflows",
+      "commands": [
+        { "command": "/goal", "description": "Long-running overnight goal execution without premature stopping" },
+        { "command": "/plan", "description": "Interactive step-by-step masterplanning workflow" },
+        { "command": "/grill-me", "description": "Interactive technical interview to stress-test architectural decisions" },
+        { "command": "/browser", "description": "Web browsing, live research, and web application interaction" },
+        { "command": "/schedule", "description": "Recurring background crons and one-shot delayed timers" },
+        { "command": "/teamwork-preview", "description": "Multi-agent swarm team collaboration simulation" },
+        { "command": "/learn", "description": "Pattern extraction and permanent behavioral rule memory" },
+        { "command": "/boost", "description": "Deep multi-perspective reasoning and rigorous verification loop" }
+      ],
+      "status": "SAVED"
+    }
+  },
+  "android_and_dexter_native_layer": {
+    "dexter_screen_pet": {
+      "status": "ACTIVE",
+      "features": [
+        "100% Native transparent floating overlay (No browser, SVG in-memory render)",
+        "Double-Tap Toggle: Fully Live Autonomous Mode (wandering + voice speech) vs Normal Quiet Mode",
+        "2-Second Long-Press Disappear: Speaks farewell, displays toast, unmounts cleanly",
+        "Voice Recall: 'Dexter wapas aao' respawns Dexter immediately",
+        "Real-time reactive speech bubbles synced with Jenna API"
+      ]
+    },
+    "android_hardware_cooling": {
+      "status": "ACTIVE",
+      "features": [
+        "144Hz Touch / 60Hz Idle Dynamic Refresh Rate Cooling",
+        "SurfaceFlinger Primary & Render Range locking [60.00 Hz, 144.00 Hz]",
+        "Haptic Vibration Muting for Thermal Protection",
+        "Doze Constants Optimization for Deep Sleep",
+        "Bypass Charging Architecture documentation and Game Space mapping"
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+name: auto-performance-booster
+description: Automatically cleans Termux cache, optimizes RAM, checks battery thermal state, and locks Vivo 144Hz performance.
+instructions: |
+  1. Check device CPU temperatures and battery health using Termux commands.
+  2. Clear stale temp files and cache in ~/.cache and /tmp.
+  3. Verify bypass charging state and thermal cooling profile.
+  4. Log a clean diagnostic summary.

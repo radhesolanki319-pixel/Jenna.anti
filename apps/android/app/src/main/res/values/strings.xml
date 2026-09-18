@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jenna AI</string>
+    <string name="accessibility_service_description">Jenna Autonomous AI Assistant - Enables real-time automated screen reading, touch interactions, button clicking, and voice assistance across any app on your device.</string>
+    <string name="foreground_service_title">Jenna AI Companion</string>
+    <string name="foreground_service_desc">24/7 Autonomous Lifeline &amp; Hardware Governance active</string>
+    <string name="tile_label">Jenna</string>
+</resources>

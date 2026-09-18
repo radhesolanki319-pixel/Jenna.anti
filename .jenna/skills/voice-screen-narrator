@@ -1,0 +1,6 @@
+name: voice-screen-narrator
+description: Reads current screen text or visual context and narrates a synthesized summary using audio speech tools.
+instructions: |
+  1. Take screenshot or inspect active window content.
+  2. Extract key textual highlights using OCR or multimodal analysis.
+  3. Convert summarized points into speech output or text card display.

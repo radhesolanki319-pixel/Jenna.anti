@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Outer Glow Circle -->
+    <path
+        android:fillColor="#1A38BDF8"
+        android:pathData="M24,24m-22,0a22,22 0,1,1 44,0a22,22 0,1,1 -44,0" />
+    <path
+        android:fillColor="#FF0F172A"
+        android:strokeColor="#FF38BDF8"
+        android:strokeWidth="1.8"
+        android:pathData="M24,24m-18,0a18,18 0,1,1 36,0a18,18 0,1,1 -36,0" />
+    <!-- Glowing Heart Core -->
+    <path
+        android:fillColor="#FFF472B6"
+        android:pathData="M24,16.5 C20,12 14,16 17,21 C19,25 24,29.5 24,29.5 C24,29.5 29,25 31,21 C34,16 28,12 24,16.5 Z" />
+    <!-- Sparkle Dot -->
+    <path
+        android:fillColor="#FF38BDF8"
+        android:pathData="M24,12 L25,14 L27,14 L25.5,15.5 L26,17.5 L24,16 L22,17.5 L22.5,15.5 L21,14 L23,14 Z" />
+</vector>

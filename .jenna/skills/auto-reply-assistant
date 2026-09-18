@@ -1,0 +1,6 @@
+name: auto-reply-assistant
+description: Monitors incoming chat notifications and bridges automated intelligent drafts using WhatsApp/Telegram daemons.
+instructions: |
+  1. Read incoming unread notifications or messages via daemon bridge.
+  2. Analyze sentiment and context using local AI model or python logic.
+  3. Generate smart contextual reply drafts for fast user approval or auto-send.
