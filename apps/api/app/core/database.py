@@ -18,7 +18,7 @@ engine_kwargs: dict = {
     "pool_pre_ping": True,
 }
 
-if is_testing:
+if is_testing or "sqlite" in settings.database_url:
     engine_kwargs["poolclass"] = NullPool
 else:
     engine_kwargs["poolclass"] = AsyncAdaptedQueuePool

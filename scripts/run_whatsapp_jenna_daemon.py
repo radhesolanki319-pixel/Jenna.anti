@@ -13,7 +13,9 @@ from pathlib import Path
 import httpx
 
 # Ensure Jenna API is in python path
-WORKSPACE_ROOT = Path("/storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna")
+WORKSPACE_ROOT = Path(
+    os.getenv("JENNA_WORKSPACE_ROOT", "/app" if os.path.exists("/app/apps/api") else "/storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna")
+).resolve()
 API_DIR = WORKSPACE_ROOT / "apps" / "api"
 if str(API_DIR) not in sys.path:
     sys.path.insert(0, str(API_DIR))
