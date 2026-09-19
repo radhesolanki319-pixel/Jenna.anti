@@ -56,3 +56,10 @@ coverage/
 dump.rdb
 test_venv/
 whatsapp/session/
+
+# Large Binaries & Android Build Outputs
+*.bin
+*.apk
+*.idsig
+apps/android/app/src/main/assets/
+apps/android/build/

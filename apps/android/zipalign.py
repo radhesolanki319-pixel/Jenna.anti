@@ -114,7 +114,7 @@ def _align_zip_entry(info: zipfile.ZipInfo, hdr: bytes, n: int, m: int, off_o: i
     return hdr
 
 
-def _copy_bytes(fhi: BinaryIO, fho: BinaryIO, size: int, blocksize: int = 4096) -> None:
+def _copy_bytes(fhi: BinaryIO, fho: BinaryIO, size: int, blocksize: int = 1048576) -> None:
     while size > 0:
         data = fhi.read(min(size, blocksize))
         if not data:

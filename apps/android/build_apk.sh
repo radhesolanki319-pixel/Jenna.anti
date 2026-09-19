@@ -43,11 +43,18 @@ echo "[5/7] Converting bytecode to DEX with d8..."
 find "$BUILD_DIR/classes" -name "*.class" > "$BUILD_DIR/classes.txt"
 $D8 --output "$BUILD_DIR/dex" --min-api 26 --lib "$ANDROID_JAR" @"$BUILD_DIR/classes.txt"
 
-echo "[6/7] Packaging DEX into APK..."
+echo "[6/7] Packaging DEX and Assets into APK..."
 cp "$BUILD_DIR/base.apk" "$BUILD_DIR/jenna-unsigned.apk"
 cd "$BUILD_DIR/dex"
 jar -uf "$BUILD_DIR/jenna-unsigned.apk" classes.dex
 cd "$PROJECT_ROOT"
+
+if [ -d "$ANDROID_ROOT/app/src/main/assets" ]; then
+    echo "  -> Packaging Antigravity, Cyberpunk & Knowledge Assets (1.25 GB) into APK..."
+    cd "$ANDROID_ROOT/app/src/main"
+    jar -0uf "$BUILD_DIR/jenna-unsigned.apk" assets
+    cd "$PROJECT_ROOT"
+fi
 
 echo "[7/8] Aligning APK (4-byte boundary)..."
 python3 "$ANDROID_ROOT/zipalign.py" -p 4 "$BUILD_DIR/jenna-unsigned.apk" "$BUILD_DIR/jenna-aligned.apk"

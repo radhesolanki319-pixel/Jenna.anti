@@ -4,19 +4,19 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="end"
-    android:paddingStart="60dp"
+    android:paddingStart="40dp"
     android:paddingEnd="4dp"
-    android:paddingVertical="5dp">
+    android:paddingVertical="6dp">
 
     <TextView
         android:id="@+id/text_user_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_user_bubble_luxury"
+        android:background="@drawable/bg_nexa_user_bubble"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="11dp"
+        android:paddingVertical="12dp"
         android:text="User message"
-        android:textColor="#FFFFFFFF"
+        android:textColor="#FFF5F3FA"
         android:textSize="14sp"
         android:lineSpacingMultiplier="1.2" />
 

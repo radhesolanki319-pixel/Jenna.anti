@@ -6,7 +6,7 @@ echo "  📊 Jenna AI Platform Status                     "
 echo "=================================================="
 
 # PostgreSQL
-if pg_isready -d jenna -q >/dev/null 2>&1; then
+if pg_isready -h 127.0.0.1 -p 5432 -q >/dev/null 2>&1; then
     echo "  🐘 PostgreSQL:   🟢 RUNNING (Port 5432)"
 else
     echo "  🐘 PostgreSQL:   🔴 STOPPED"

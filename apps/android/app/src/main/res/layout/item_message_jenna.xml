@@ -5,30 +5,30 @@
     android:orientation="horizontal"
     android:gravity="start|top"
     android:paddingStart="4dp"
-    android:paddingEnd="60dp"
-    android:paddingVertical="5dp">
+    android:paddingEnd="40dp"
+    android:paddingVertical="6dp">
 
     <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:layout_marginTop="2dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_jenna_avatar"
-        android:contentDescription="Jenna" />
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/nexa_avatar"
+        android:contentDescription="NEXA" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_jenna_bubble_luxury"
+        android:background="@drawable/bg_nexa_bot_bubble"
         android:orientation="vertical"
-        android:paddingHorizontal="15dp"
-        android:paddingVertical="10dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Jenna"
-            android:textColor="@color/accent_pink"
+            android:text="NEXA"
+            android:textColor="#FFFF2B85"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -36,9 +36,9 @@
             android:id="@+id/text_jenna_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="Jenna response"
-            android:textColor="@color/text_primary"
+            android:layout_marginTop="4dp"
+            android:text="NEXA response"
+            android:textColor="#FFF5F3FA"
             android:textSize="14sp"
             android:lineSpacingMultiplier="1.25" />
 
