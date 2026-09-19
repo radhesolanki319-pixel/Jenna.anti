@@ -69,3 +69,4 @@ exported_chats/
 ALL_CHATS_CONSOLIDATED.md
 all_past_conversations.md
 
+.render_hook

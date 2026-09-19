@@ -29,7 +29,13 @@ if [ -z "$DATABASE_URL" ] || [[ "$DATABASE_URL" == *"localhost"* ]]; then
     echo "📁 [Jenna Cloud] Using SQLite database at /app/data/jenna.db"
 fi
 
-# 3. Start Baileys WhatsApp Bridge in the background
+# 3. Start local Redis server if not running
+if command -v redis-server > /dev/null 2>&1; then
+    echo "⚡ [Jenna Cloud] Starting local Redis daemon..."
+    redis-server --daemonize yes --save "" --appendonly no --protected-mode no || true
+fi
+
+# 4. Start Baileys WhatsApp Bridge in the background
 echo "🌉 [Jenna Cloud] Starting WhatsApp Baileys Bridge on port 3000..."
 mkdir -p /app/logs
 node /app/whatsapp/bridge/bridge.js \

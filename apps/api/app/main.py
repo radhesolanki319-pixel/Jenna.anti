@@ -52,6 +52,18 @@ async def lifespan(app: FastAPI):
 
     # Establish Redis connection abstraction
     await redis_client.connect()
+
+    # Auto-initialize database tables for SQLite cloud storage
+    if "sqlite" in settings.database_url.lower():
+        try:
+            import app.models  # noqa: F401
+            from app.core.database import Base
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("SQLite database schema initialized successfully.")
+        except Exception as e:
+            logger.warning(f"Note on SQLite schema init: {e}")
+
     yield
 
     # Clean shutdown
