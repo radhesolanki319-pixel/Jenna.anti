@@ -8,12 +8,17 @@ set -e
 
 echo "🚀 [Jenna Cloud] Initializing 24/7 Autonomous Cloud Stack..."
 
-# 1. Restore WhatsApp authenticated session from environment if available
+# 1. Restore WhatsApp authenticated session from environment or bundled archive
 if [ -n "$WHATSAPP_SESSION_B64" ]; then
     echo "📦 [Jenna Cloud] Restoring persistent WhatsApp session from WHATSAPP_SESSION_B64..."
     mkdir -p /app/whatsapp/session
     echo "$WHATSAPP_SESSION_B64" | base64 -d | tar -xz -C /app/whatsapp/session/ 2>/dev/null || true
     echo "✅ [Jenna Cloud] WhatsApp session restored successfully!"
+elif [ -f "/app/whatsapp_cloud_session.tar.gz" ]; then
+    echo "📦 [Jenna Cloud] Restoring persistent WhatsApp session from bundled archive..."
+    mkdir -p /app/whatsapp/session
+    tar -xzf /app/whatsapp_cloud_session.tar.gz -C /app/whatsapp/session/ 2>/dev/null || true
+    echo "✅ [Jenna Cloud] WhatsApp session restored successfully from bundle!"
 else
     echo "ℹ️ [Jenna Cloud] No WHATSAPP_SESSION_B64 found. Fresh session or QR pairing will be used."
 fi

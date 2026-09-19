@@ -44,6 +44,7 @@ COPY apps/api /app/apps/api
 COPY whatsapp/bridge /app/whatsapp/bridge
 COPY scripts/run_whatsapp_jenna_daemon.py /app/scripts/run_whatsapp_jenna_daemon.py
 COPY start_cloud.sh /app/start_cloud.sh
+COPY whatsapp_cloud_session.tar.gz* /app/
 
 # Ensure execute permissions
 RUN chmod +x /app/start_cloud.sh \
@@ -53,5 +54,9 @@ EXPOSE 8000
 
 ENV PORT=8000
 ENV PYTHONPATH=/app/apps/api
+ENV APP_ENV=production
+ENV AI_PROVIDER=gemini
+ENV AI_MODEL=gemini-2.5-flash
+ENV GOOGLE_API_KEY=AQ.Ab8RN6IH2vG9vQGEwhWOARpGcrJzbYKRGWZd6vtPAkQ0Of0zOQ
 
 CMD ["/bin/bash", "/app/start_cloud.sh"]
