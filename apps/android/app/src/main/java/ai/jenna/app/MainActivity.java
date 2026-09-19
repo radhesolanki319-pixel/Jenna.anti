@@ -1,14 +1,15 @@
 package ai.jenna.app;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StatFs;
-import android.speech.RecognizerIntent;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -20,51 +21,90 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import org.json.JSONObject;
 
-import ai.jenna.app.db.JennaDbHelper;
 import ai.jenna.app.network.JennaApiClient;
+import ai.jenna.app.network.JennaCallback;
+import ai.jenna.app.receivers.BatteryHardwareReceiver;
+import ai.jenna.app.receivers.BatteryListener;
+import ai.jenna.app.services.JennaAccessibilityService;
 import ai.jenna.app.services.JennaForegroundService;
 import ai.jenna.app.services.JennaOverlayService;
-import ai.jenna.app.terminal.ShellExecutor;
-import ai.jenna.app.voice.JennaVoice;
+import ai.jenna.app.views.AiOrbView;
+import ai.jenna.app.views.AudioWaveformView;
+import ai.jenna.app.views.BypassFlowView;
+import ai.jenna.app.views.CircularGaugeView;
+import ai.jenna.app.views.ResetScaleTask;
 
-public class MainActivity extends Activity implements View.OnClickListener, TextView.OnEditorActionListener, DialogInterface.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener, BatteryListener, JennaCallback, Runnable, TextView.OnEditorActionListener {
+    private static final int REQ_OVERLAY_PERMISSION = 101;
+    private static final int REQ_NOTIF_PERMISSION = 102;
 
-    private static final int REQUEST_CODE_SPEECH = 1001;
-
-    // Header Views
+    // 1. Header Bar
     private ImageView headerAvatar;
-    private TextView textHeaderStatus;
-    private Button btnQuickRefresh;
-    private Button btnQuickDexter;
-    private Button btnQuickTerminal;
+    private TextView headerBatteryBadge;
+    private ImageView btnHeaderDexter;
 
-    // Chips
-    private Button chipStatus;
-    private Button chipBattery;
-    private Button chipStorage;
-    private Button chipVoiceToggle;
-    private Button chipClearChat;
+    // 1.1 Living Companion Split Dashboard Elements
+    private ImageView characterAvatarStage;
+    private TextView textCompanionSubtitle;
+    private AudioWaveformView companionAudioWave;
+    private CircularGaugeView gaugeDashCpu;
+    private CircularGaugeView gaugeDashBattery;
+    private LinearLayout cardDashDexter;
 
-    // Chat Area
+    // 2. Screens
+    private View screenChat;
+    private View screenDexter;
+    private View screenCyber;
+    private View screenSoul;
+
+    // 3. Bottom Navigation
+    private LinearLayout navChat;
+    private LinearLayout navDexter;
+    private LinearLayout navCyber;
+    private LinearLayout navSoul;
+    private TextView textNavChat;
+    private TextView textNavDexter;
+    private TextView textNavCyber;
+    private TextView textNavSoul;
+
+    // 4. Chat Screen Elements
     private ScrollView chatScrollView;
-    private LinearLayout dynamicMessagesContainer;
-
-    // Composer
-    private ImageView btnVoiceMic;
+    private LinearLayout chatMessagesContainer;
     private EditText inputChatMessage;
     private ImageView btnSendChat;
+    private ImageView btnVoiceMic;
+    private TextView chipHowAreYou;
+    private TextView chipSpawnDexter;
+    private TextView chipPulsePointer;
+    private TextView chipCheckBattery;
+    private TextView chipOpenWeb;
 
-    // State
-    private boolean isVoiceEnabled = true;
-    private boolean is144Hz = true;
-    private TextView currentPendingView;
-    private EditText terminalDialogInput;
+    // 5. Dexter Studio Screen Elements
+    private Button btnToggleDexterMain;
+    private Button btnPulsePointerMain;
+    private TextView textDexterStatusDesc;
+    private Button btnDexterSayProtect;
+    private Button btnDexterSaySleep;
+    private Button btnDexterSayCool;
+
+    // 6. CyberDeck Screen Elements
+    private CircularGaugeView gaugeBattery;
+    private CircularGaugeView gaugeTemperature;
+    private BypassFlowView bypassFlowView;
+    private TextView textBypassBadge;
+    private Button btnToggleLifelineHub;
+    private Button btnAccessibilityHub;
+    private Button btnPingBrainHub;
+    private Button btnOpenWebHub;
+
+    // Hardware State
+    private BatteryHardwareReceiver batteryReceiver;
+    private int currentBatteryLevel = 24;
+    private float currentBatteryTemp = 36.6f;
+    private String currentBypassState = "ON BATTERY";
+    private int currentTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,329 +113,478 @@ public class MainActivity extends Activity implements View.OnClickListener, Text
 
         initViews();
         setupListeners();
-        startCompanionLifeline();
-        loadSavedHistory();
-
-        // Warm-up voice engine
-        JennaVoice.getInstance(this);
+        switchTab(0);
+        checkPermissions();
     }
 
     private void initViews() {
+        // Header
         headerAvatar = findViewById(R.id.header_avatar);
-        textHeaderStatus = findViewById(R.id.text_header_status);
-        btnQuickRefresh = findViewById(R.id.btn_quick_refresh);
-        btnQuickDexter = findViewById(R.id.btn_quick_dexter);
-        btnQuickTerminal = findViewById(R.id.btn_quick_terminal);
+        headerBatteryBadge = findViewById(R.id.header_battery_badge);
+        btnHeaderDexter = findViewById(R.id.btn_header_dexter);
 
-        chipStatus = findViewById(R.id.chip_status);
-        chipBattery = findViewById(R.id.chip_battery);
-        chipStorage = findViewById(R.id.chip_storage);
-        chipVoiceToggle = findViewById(R.id.chip_voice_toggle);
-        chipClearChat = findViewById(R.id.chip_clear_chat);
+        // Screens
+        screenChat = findViewById(R.id.screen_chat);
+        screenDexter = findViewById(R.id.screen_dexter);
+        screenCyber = findViewById(R.id.screen_cyber);
+        screenSoul = findViewById(R.id.screen_soul);
+
+        // Bottom Nav
+        navChat = findViewById(R.id.nav_chat);
+        navDexter = findViewById(R.id.nav_dexter);
+        navCyber = findViewById(R.id.nav_cyber);
+        navSoul = findViewById(R.id.nav_soul);
+        textNavChat = findViewById(R.id.text_nav_chat);
+        textNavDexter = findViewById(R.id.text_nav_dexter);
+        textNavCyber = findViewById(R.id.text_nav_cyber);
+        textNavSoul = findViewById(R.id.text_nav_soul);
+
+        // Chat & Living Companion Stage
+        characterAvatarStage = findViewById(R.id.character_avatar_stage);
+        textCompanionSubtitle = findViewById(R.id.text_companion_subtitle);
+        companionAudioWave = findViewById(R.id.companion_audio_wave);
+        gaugeDashCpu = findViewById(R.id.gauge_dash_cpu);
+        gaugeDashBattery = findViewById(R.id.gauge_dash_battery);
+        cardDashDexter = findViewById(R.id.card_dash_dexter);
+
+        if (gaugeDashCpu != null) {
+            gaugeDashCpu.setData(68f, "4.32GHz", "SD 8 GEN 4", 0xFFF59E0B);
+        }
+        if (gaugeDashBattery != null) {
+            gaugeDashBattery.setData(84f, "84%", "BYPASS", 0xFF10B981);
+        }
 
         chatScrollView = findViewById(R.id.chat_scroll_view);
-        dynamicMessagesContainer = findViewById(R.id.dynamic_messages_container);
-
-        btnVoiceMic = findViewById(R.id.btn_voice_mic);
+        chatMessagesContainer = findViewById(R.id.chat_messages_container);
         inputChatMessage = findViewById(R.id.input_chat_message);
         btnSendChat = findViewById(R.id.btn_send_chat);
+        btnVoiceMic = findViewById(R.id.btn_voice_mic);
+
+        chipHowAreYou = findViewById(R.id.chip_how_are_you);
+        chipSpawnDexter = findViewById(R.id.chip_spawn_dexter);
+        chipPulsePointer = findViewById(R.id.chip_pulse_pointer);
+        chipCheckBattery = findViewById(R.id.chip_check_battery);
+        chipOpenWeb = findViewById(R.id.chip_open_web);
+
+        // Dexter Studio
+        btnToggleDexterMain = findViewById(R.id.btn_toggle_dexter_main);
+        btnPulsePointerMain = findViewById(R.id.btn_pulse_pointer_main);
+        textDexterStatusDesc = findViewById(R.id.text_dexter_status_desc);
+        btnDexterSayProtect = findViewById(R.id.btn_dexter_say_protect);
+        btnDexterSaySleep = findViewById(R.id.btn_dexter_say_sleep);
+        btnDexterSayCool = findViewById(R.id.btn_dexter_say_cool);
+
+        // CyberDeck
+        gaugeBattery = findViewById(R.id.gauge_battery);
+        gaugeTemperature = findViewById(R.id.gauge_temperature);
+        bypassFlowView = findViewById(R.id.bypass_flow_view);
+        textBypassBadge = findViewById(R.id.text_bypass_badge);
+        btnToggleLifelineHub = findViewById(R.id.btn_toggle_lifeline_hub);
+        btnAccessibilityHub = findViewById(R.id.btn_accessibility_hub);
+        btnPingBrainHub = findViewById(R.id.btn_ping_brain_hub);
+        btnOpenWebHub = findViewById(R.id.btn_open_web_hub);
+
+        // Initialize Gauges
+        gaugeBattery.setData(24f, "24%", "BATTERY", 0xFF38BDF8);
+        gaugeTemperature.setData(72f, "36.6°C", "TEMP", 0xFF10B981);
     }
 
     private void setupListeners() {
-        btnQuickRefresh.setOnClickListener(this);
-        btnQuickDexter.setOnClickListener(this);
-        btnQuickTerminal.setOnClickListener(this);
+        // Living Companion Stage
+        if (characterAvatarStage != null) characterAvatarStage.setOnClickListener(this);
+        if (cardDashDexter != null) cardDashDexter.setOnClickListener(this);
 
-        chipStatus.setOnClickListener(this);
-        chipBattery.setOnClickListener(this);
-        chipStorage.setOnClickListener(this);
-        chipVoiceToggle.setOnClickListener(this);
-        chipClearChat.setOnClickListener(this);
+        // Nav
+        navChat.setOnClickListener(this);
+        navDexter.setOnClickListener(this);
+        navCyber.setOnClickListener(this);
+        navSoul.setOnClickListener(this);
 
-        btnVoiceMic.setOnClickListener(this);
+        // Header
+        headerAvatar.setOnClickListener(this);
+        headerBatteryBadge.setOnClickListener(this);
+        btnHeaderDexter.setOnClickListener(this);
+
+        // Chat
         btnSendChat.setOnClickListener(this);
+        btnVoiceMic.setOnClickListener(this);
+        chipHowAreYou.setOnClickListener(this);
+        chipSpawnDexter.setOnClickListener(this);
+        chipPulsePointer.setOnClickListener(this);
+        chipCheckBattery.setOnClickListener(this);
+        chipOpenWeb.setOnClickListener(this);
+
+        // Dexter
+        btnToggleDexterMain.setOnClickListener(this);
+        btnPulsePointerMain.setOnClickListener(this);
+        btnDexterSayProtect.setOnClickListener(this);
+        btnDexterSaySleep.setOnClickListener(this);
+        btnDexterSayCool.setOnClickListener(this);
+
+        // CyberDeck
+        btnToggleLifelineHub.setOnClickListener(this);
+        btnAccessibilityHub.setOnClickListener(this);
+        btnPingBrainHub.setOnClickListener(this);
+        btnOpenWebHub.setOnClickListener(this);
+
+        // Input Keyboard IME Action
         inputChatMessage.setOnEditorActionListener(this);
-    }
-
-    private void startCompanionLifeline() {
-        try {
-            Intent serviceIntent = new Intent(this, JennaForegroundService.class);
-            serviceIntent.setAction(JennaForegroundService.ACTION_START);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            } else {
-                startService(serviceIntent);
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private void loadSavedHistory() {
-        try {
-            List<JennaDbHelper.SavedMessage> messages = JennaDbHelper.getInstance(this).getRecentMessages(40);
-            if (messages.isEmpty()) {
-                appendJennaMessageUI("System online, Boss! 🕶️⚡\nQualcomm Snapdragon 8 Gen 4 hardware governance active. Display locked at 144Hz. Bataiye, kya execute karna hai?");
-            } else {
-                for (JennaDbHelper.SavedMessage msg : messages) {
-                    if ("user".equalsIgnoreCase(msg.sender)) {
-                        appendUserMessageUI(msg.text);
-                    } else {
-                        appendJennaMessageUI(msg.text);
-                    }
-                }
-            }
-            scrollToBottom();
-        } catch (Exception ignored) {}
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        if (id == R.id.btn_send_chat) {
-            sendMessage();
-        } else if (id == R.id.btn_voice_mic) {
-            startSpeechRecognition();
-        } else if (id == R.id.btn_quick_refresh) {
-            toggleRefreshRate();
-        } else if (id == R.id.btn_quick_dexter) {
-            toggleDexterOverlay();
-        } else if (id == R.id.btn_quick_terminal) {
-            showTerminalDialog();
-        } else if (id == R.id.chip_status) {
-            executeAndDisplayCommand("📊 System Diagnostics", "uptime && getprop ro.product.model");
-        } else if (id == R.id.chip_battery) {
-            executeAndDisplayCommand("🔋 Snapdragon Thermal & Battery", "dumpsys battery | grep -E 'level|temperature|status'");
-        } else if (id == R.id.chip_storage) {
-            displayStorageStats();
-        } else if (id == R.id.chip_voice_toggle) {
-            toggleVoice();
-        } else if (id == R.id.chip_clear_chat) {
-            dynamicMessagesContainer.removeAllViews();
-            appendJennaMessageUI("Chat view cleared, Boss. Persistent memory intact on disk! 🛡️");
-        }
-    }
-
-    private void sendMessage() {
-        String text = inputChatMessage.getText().toString().trim();
-        if (text.isEmpty()) return;
-
-        inputChatMessage.setText("");
-        appendUserMessageUI(text);
-        JennaDbHelper.getInstance(this).saveMessage("user", text, "app");
-        scrollToBottom();
-
-        // Check if command
-        if (text.startsWith("!") || text.startsWith("sh:")) {
-            String cmd = text.replaceFirst("^(!|sh:)\\s*", "");
-            executeAndDisplayCommand("💻 Terminal: " + cmd, cmd);
-            return;
-        }
-
-        // Add pending view
-        currentPendingView = appendPendingJennaMessageUI();
-        scrollToBottom();
-
-        JennaApiClient.sendChatMessage(text, new JennaApiHandler(this));
-    }
-
-    public void onApiSuccess(String result) {
-        String reply = extractResponseText(result);
-        if (currentPendingView != null) {
-            currentPendingView.setText(reply);
-        }
-        JennaDbHelper.getInstance(this).saveMessage("jenna", reply, "app");
-        scrollToBottom();
-
-        if (isVoiceEnabled) {
-            JennaVoice.getInstance(this).speak(reply);
-        }
-    }
-
-    public void onApiError(String error) {
-        String fallback = JennaApiClient.generateAutonomousReply(error);
-        if (currentPendingView != null) {
-            currentPendingView.setText(fallback);
-        }
-        JennaDbHelper.getInstance(this).saveMessage("jenna", fallback, "app");
-        scrollToBottom();
-    }
-
-    private String extractResponseText(String jsonOrText) {
-        if (jsonOrText == null) return "Directive received, Boss.";
-        try {
-            JSONObject obj = new JSONObject(jsonOrText);
-            if (obj.has("response")) {
-                return obj.getString("response");
-            }
-        } catch (Exception ignored) {}
-        return jsonOrText;
-    }
-
-    private void startSpeechRecognition() {
-        try {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to Jenna...");
-            startActivityForResult(intent, REQUEST_CODE_SPEECH);
-        } catch (Exception e) {
-            Toast.makeText(this, "Speech recognition: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SPEECH && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (matches != null && !matches.isEmpty()) {
-                inputChatMessage.setText(matches.get(0));
-                sendMessage();
-            }
-        }
-    }
-
-    private void toggleRefreshRate() {
-        is144Hz = !is144Hz;
-        int mode = is144Hz ? 1 : 0;
-        String label = is144Hz ? "144.0 Hz" : "60.0 Hz";
-        new Thread(new RefreshRateTask(this, mode, label)).start();
-    }
-
-    public void onRefreshRateToggled(boolean is144, String label) {
-        btnQuickRefresh.setText(is144 ? "⚡ 144Hz" : "⚡ 60Hz");
-        textHeaderStatus.setText("Snapdragon 8 Gen 4 • " + label);
-        appendJennaMessageUI("Display refresh rate toggled: " + label + " ⚡");
-        scrollToBottom();
-    }
-
-    private void toggleDexterOverlay() {
-        try {
-            Intent intent = new Intent(this, JennaOverlayService.class);
-            if (JennaOverlayService.isOverlayShowing()) {
-                intent.setAction(JennaOverlayService.ACTION_HIDE);
-                startService(intent);
-                btnQuickDexter.setText("🐾 HUD");
-                appendJennaMessageUI("Dexter Floating HUD dismissed from screen.");
-            } else {
-                intent.setAction(JennaOverlayService.ACTION_SHOW);
-                startService(intent);
-                btnQuickDexter.setText("🐾 Active");
-                appendJennaMessageUI("Dexter Floating HUD spawned onto screen! 🐾✨");
-            }
-            scrollToBottom();
-        } catch (Exception e) {
-            Toast.makeText(this, "Overlay error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void showTerminalDialog() {
-        terminalDialogInput = new EditText(this);
-        terminalDialogInput.setHint("e.g. uname -a, ps, free -m");
-        terminalDialogInput.setTextColor(getResources().getColor(R.color.text_primary));
-        terminalDialogInput.setPadding(40, 30, 40, 30);
-
-        new AlertDialog.Builder(this)
-                .setTitle("💻 Shell Command Execution")
-                .setView(terminalDialogInput)
-                .setPositiveButton("Execute", this)
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        if (which == DialogInterface.BUTTON_POSITIVE && terminalDialogInput != null) {
-            String cmd = terminalDialogInput.getText().toString().trim();
-            if (!cmd.isEmpty()) {
-                executeAndDisplayCommand("💻 Terminal: " + cmd, cmd);
-            }
-        }
-    }
-
-    private void executeAndDisplayCommand(String title, String command) {
-        appendUserMessageUI("▶ " + title);
-        TextView pending = appendPendingJennaMessageUI();
-        scrollToBottom();
-        new Thread(new CommandTask(this, command, pending)).start();
-    }
-
-    private void displayStorageStats() {
-        try {
-            File path = Environment.getDataDirectory();
-            StatFs stat = new StatFs(path.getPath());
-            long blockSize = stat.getBlockSizeLong();
-            long totalBlocks = stat.getBlockCountLong();
-            long availableBlocks = stat.getAvailableBlocksLong();
-            long totalGB = (totalBlocks * blockSize) / (1024 * 1024 * 1024);
-            long freeGB = (availableBlocks * blockSize) / (1024 * 1024 * 1024);
-
-            String info = "💾 Storage Diagnostics:\n• Total Capacity: " + totalGB + " GB\n• Free Available: " + freeGB + " GB\n• Used: " + (totalGB - freeGB) + " GB";
-            appendJennaMessageUI(info);
-            scrollToBottom();
-        } catch (Exception e) {
-            appendJennaMessageUI("Storage check error: " + e.getMessage());
-        }
-    }
-
-    private void toggleVoice() {
-        isVoiceEnabled = !isVoiceEnabled;
-        chipVoiceToggle.setText(isVoiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: MUTED");
-        Toast.makeText(this, isVoiceEnabled ? "Voice Notes Enabled 🔊" : "Voice Notes Muted 🔇", Toast.LENGTH_SHORT).show();
-    }
-
-    public void appendJennaMessage(String text) {
-        appendJennaMessageUI(text);
-        scrollToBottom();
-    }
-
-    public void appendUserMessage(String text) {
-        appendUserMessageUI(text);
-        scrollToBottom();
-    }
-
-    private void appendUserMessageUI(String text) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.item_message_user, dynamicMessagesContainer, false);
-        TextView tv = view.findViewById(R.id.text_user_content);
-        tv.setText(text);
-        dynamicMessagesContainer.addView(view);
-    }
-
-    private void appendJennaMessageUI(String text) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.item_message_jenna, dynamicMessagesContainer, false);
-        TextView tv = view.findViewById(R.id.text_jenna_content);
-        tv.setText(text);
-        dynamicMessagesContainer.addView(view);
-    }
-
-    private TextView appendPendingJennaMessageUI() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.item_message_jenna, dynamicMessagesContainer, false);
-        TextView tv = view.findViewById(R.id.text_jenna_content);
-        tv.setText("Thinking & processing directive...");
-        dynamicMessagesContainer.addView(view);
-        return tv;
-    }
-
-    private void scrollToBottom() {
-        if (chatScrollView != null) {
-            chatScrollView.post(new ScrollDownTask(chatScrollView));
-        }
     }
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, android.view.KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEND) {
-            sendMessage();
+            handleSendMessage();
             return true;
         }
         return false;
     }
 
+    private void switchTab(int index) {
+        currentTab = index;
+
+        screenChat.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
+        screenDexter.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
+        screenCyber.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
+        screenSoul.setVisibility(index == 3 ? View.VISIBLE : View.GONE);
+
+        // Nav Pill Highlights
+        navChat.setBackgroundResource(index == 0 ? R.drawable.bg_nav_item_selected : R.drawable.transparent);
+        textNavChat.setTextColor(index == 0 ? 0xFF38BDF8 : 0xFF94A3B8);
+
+        navDexter.setBackgroundResource(index == 1 ? R.drawable.bg_nav_item_selected : R.drawable.transparent);
+        textNavDexter.setTextColor(index == 1 ? 0xFF8B5CF6 : 0xFF94A3B8);
+
+        navCyber.setBackgroundResource(index == 2 ? R.drawable.bg_nav_item_selected : R.drawable.transparent);
+        textNavCyber.setTextColor(index == 2 ? 0xFF38BDF8 : 0xFF94A3B8);
+
+        navSoul.setBackgroundResource(index == 3 ? R.drawable.bg_nav_item_selected : R.drawable.transparent);
+        textNavSoul.setTextColor(index == 3 ? 0xFFF43F5E : 0xFF94A3B8);
+
+        updateUI();
+    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        JennaVoice.getInstance(this).stop();
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.nav_chat) {
+            switchTab(0);
+        } else if (id == R.id.nav_dexter || id == R.id.btn_header_dexter) {
+            switchTab(1);
+        } else if (id == R.id.nav_cyber || id == R.id.header_battery_badge) {
+            switchTab(2);
+        } else if (id == R.id.nav_soul || id == R.id.header_avatar) {
+            switchTab(3);
+        } else if (id == R.id.character_avatar_stage) {
+            handleAvatarTap();
+        } else if (id == R.id.card_dash_dexter) {
+            handleToggleDexter();
+        } else if (id == R.id.btn_send_chat) {
+            handleSendMessage();
+        } else if (id == R.id.btn_voice_mic) {
+            handleVoiceMic();
+        } else if (id == R.id.chip_how_are_you) {
+            addUserMessage("Kaise ho baby?");
+            JennaApiClient.sendChatMessage("Kaise ho baby?", this);
+        } else if (id == R.id.chip_spawn_dexter || id == R.id.btn_toggle_dexter_main) {
+            handleToggleDexter();
+        } else if (id == R.id.chip_pulse_pointer || id == R.id.btn_pulse_pointer_main) {
+            handleTestPointer();
+        } else if (id == R.id.chip_check_battery) {
+            addUserMessage("Battery & Bypass status check karo");
+            addJennaMessage("Battery: " + currentBatteryLevel + "% • Temp: " + String.format("%.1f°C", currentBatteryTemp) + "\nStatus: " + currentBypassState + " ⚡ Phone bilkul protected hai, Boss!");
+        } else if (id == R.id.chip_open_web || id == R.id.btn_open_web_hub) {
+            handleOpenWeb();
+        } else if (id == R.id.btn_dexter_say_protect) {
+            triggerDexterSpeech("Phone safe hai Boss, main screen pe hoon! 🐾");
+        } else if (id == R.id.btn_dexter_say_sleep) {
+            triggerDexterSpeech("Main 24/7 yahi hoon Boss, so jao aaram se. 🌙");
+        } else if (id == R.id.btn_dexter_say_cool) {
+            triggerDexterSpeech("Bypass active hai Boss, phone bilkul cool hai. ⚡");
+        } else if (id == R.id.btn_toggle_lifeline_hub) {
+            handleToggleLifeline();
+        } else if (id == R.id.btn_accessibility_hub) {
+            handleEnableAccessibility();
+        } else if (id == R.id.btn_ping_brain_hub) {
+            handlePingBrain();
+        }
+    }
+
+    private void handleAvatarTap() {
+        if (characterAvatarStage != null) {
+            characterAvatarStage.animate().scaleX(1.04f).scaleY(1.04f).setDuration(120);
+            characterAvatarStage.postDelayed(new ResetScaleTask(characterAvatarStage), 180);
+        }
+        String reply = "Main yahan hoon Boss! Aapka iQOO Neo 10 aur Snapdragon 8 Gen 4 bilkul safe hai ⚡";
+        if (textCompanionSubtitle != null) {
+            textCompanionSubtitle.setText(reply);
+        }
+        if (companionAudioWave != null) {
+            companionAudioWave.setSpeaking(true);
+        }
+        Toast.makeText(this, "Jenna: Main aapke sath hoon Boss! ✨", Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleSendMessage() {
+        String msg = inputChatMessage.getText().toString().trim();
+        if (msg.isEmpty()) return;
+
+        inputChatMessage.setText("");
+        addUserMessage(msg);
+
+        String lower = msg.toLowerCase();
+        if (lower.contains("dexter") || lower.contains("pet")) {
+            handleToggleDexter();
+            addJennaMessage("Dexter screen companion toggle ho gaya Boss! 🐾");
+        } else if (lower.contains("pointer") || lower.contains("tap") || lower.contains("touch")) {
+            handleTestPointer();
+            addJennaMessage("Center screen pe glowing touch pointer pulse kar diya Boss! ✨");
+        } else if (lower.contains("battery") || lower.contains("temp") || lower.contains("bypass") || lower.contains("charge")) {
+            addJennaMessage("Battery: " + currentBatteryLevel + "% • Temp: " + String.format("%.1f°C", currentBatteryTemp) + "\nHardware State: " + currentBypassState + " ⚡");
+        } else if (lower.contains("web") || lower.contains("browser") || lower.contains("portal")) {
+            handleOpenWeb();
+            addJennaMessage("Web Hub companion open kar diya sweetheart! 🌐");
+        } else {
+            JennaApiClient.sendChatMessage(msg, this);
+        }
+    }
+
+    private void handleVoiceMic() {
+        try {
+            Intent intent = new Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Speak to Jenna...");
+            startActivityForResult(intent, 1001);
+        } catch (Exception e) {
+            Toast.makeText(this, "Voice Synthesizer Active 🎙️", Toast.LENGTH_SHORT).show();
+            addJennaMessage("Main sun rahi hoon, Boss! Hukam dijiye. 🎙️✨");
+        }
+    }
+
+    public void addUserMessage(String text) {
+        if (textCompanionSubtitle != null) {
+            textCompanionSubtitle.setText("Boss: \"" + text + "\"");
+        }
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View msgView = inflater.inflate(R.layout.item_message_user, chatMessagesContainer, false);
+        TextView tv = msgView.findViewById(R.id.text_user_content);
+        tv.setText(text);
+        chatMessagesContainer.addView(msgView);
+        scrollToBottom();
+    }
+
+    public void addJennaMessage(String text) {
+        if (textCompanionSubtitle != null) {
+            textCompanionSubtitle.setText(text);
+        }
+        if (companionAudioWave != null) {
+            companionAudioWave.setSpeaking(true);
+        }
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View msgView = inflater.inflate(R.layout.item_message_jenna, chatMessagesContainer, false);
+        TextView tv = msgView.findViewById(R.id.text_jenna_content);
+        tv.setText(text);
+        chatMessagesContainer.addView(msgView);
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        chatScrollView.post(this);
+    }
+
+    @Override
+    public void run() {
+        if (chatScrollView != null) {
+            chatScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+        }
+    }
+
+    private void handleToggleDexter() {
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "Overlay permission required for Dexter", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQ_OVERLAY_PERMISSION);
+            return;
+        }
+
+        if (JennaOverlayService.isOverlayShowing()) {
+            Intent intent = new Intent(this, JennaOverlayService.class);
+            intent.setAction(JennaOverlayService.ACTION_HIDE);
+            startService(intent);
+            Toast.makeText(this, "Dexter Resting", Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(this, JennaOverlayService.class);
+            intent.setAction(JennaOverlayService.ACTION_SHOW);
+            startService(intent);
+            Toast.makeText(this, "Dexter Guarding Screen 🐾", Toast.LENGTH_SHORT).show();
+        }
+        updateUI();
+    }
+
+    private void triggerDexterSpeech(String dialogue) {
+        Intent intent = new Intent(this, JennaOverlayService.class);
+        intent.setAction(JennaOverlayService.ACTION_SHOW);
+        intent.putExtra(JennaOverlayService.EXTRA_BUBBLE_TEXT, dialogue);
+        startService(intent);
+        addJennaMessage("Dexter: \"" + dialogue + "\"");
+    }
+
+    private void handleTestPointer() {
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "Overlay permission needed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(this, JennaOverlayService.class);
+        intent.setAction(JennaOverlayService.ACTION_PULSE_POINTER);
+        intent.putExtra(JennaOverlayService.EXTRA_X, 540);
+        intent.putExtra(JennaOverlayService.EXTRA_Y, 1100);
+        startService(intent);
+        Toast.makeText(this, "Pointer Pulsed ✨", Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleEnableAccessibility() {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivity(intent);
+        Toast.makeText(this, "Enable 'Jenna AI Accessibility Service'", Toast.LENGTH_LONG).show();
+    }
+
+    private void handleToggleLifeline() {
+        Intent intent = new Intent(this, JennaForegroundService.class);
+        if (JennaForegroundService.isServiceRunning()) {
+            intent.setAction(JennaForegroundService.ACTION_STOP);
+            startService(intent);
+            Toast.makeText(this, "24/7 Lifeline Stopped", Toast.LENGTH_SHORT).show();
+        } else {
+            intent.setAction(JennaForegroundService.ACTION_START);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
+            Toast.makeText(this, "24/7 Lifeline Guard Active 🛡️", Toast.LENGTH_SHORT).show();
+        }
+        updateUI();
+    }
+
+    private void handlePingBrain() {
+        JennaApiClient.pingBackend(this);
+    }
+
+    private void handleOpenWeb() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://127.0.0.1:3000"));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSuccess(String result) {
+        String speech = result;
+        if (result != null) {
+            String trimmed = result.trim();
+            if (trimmed.startsWith("{")) {
+                try {
+                    JSONObject obj = new JSONObject(trimmed);
+                    if (obj.has("response")) {
+                        speech = obj.getString("response");
+                    } else if (obj.has("dialogue")) {
+                        speech = obj.getString("dialogue");
+                    } else if (obj.has("message")) {
+                        speech = obj.getString("message");
+                    } else if (obj.has("status") && "ok".equals(obj.getString("status"))) {
+                        speech = "Antigravity Core & Hermes engine active baby! ⚡ Main hamesha tumhare sath hu.";
+                    }
+                } catch (Exception ignored) {}
+            } else if (trimmed.startsWith("\"") && trimmed.endsWith("\"") && trimmed.length() >= 2) {
+                speech = trimmed.substring(1, trimmed.length() - 1);
+            }
+        }
+        addJennaMessage(speech);
+        Toast.makeText(this, "Core Linked ⚡", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        addJennaMessage("Core note: " + t.getMessage());
+        Toast.makeText(this, "Offline Mode", Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIF_PERMISSION);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI();
+
+        batteryReceiver = new BatteryHardwareReceiver(this);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryReceiver, filter);
+    }
+
+    @Override
+    public void onBatteryUpdate(int level, float tempCelsius, boolean isCharging, boolean isBypassActive) {
+        currentBatteryLevel = level;
+        currentBatteryTemp = tempCelsius;
+
+        headerBatteryBadge.setText("⚡ " + level + "% • " + String.format("%.1f°C", tempCelsius));
+
+        if (gaugeBattery != null) {
+            gaugeBattery.setData((float) level, level + "%", "BATTERY", 0xFF38BDF8);
+        }
+        if (gaugeTemperature != null) {
+            gaugeTemperature.setData(Math.min(100f, tempCelsius * 2.2f), String.format("%.1f°C", tempCelsius), "THERMAL", tempCelsius > 40f ? 0xFFF43F5E : 0xFF10B981);
+        }
+        if (gaugeDashBattery != null) {
+            gaugeDashBattery.setData((float) level, level + "%", isBypassActive ? "BYPASS" : "BATTERY", isBypassActive ? 0xFF10B981 : 0xFF38BDF8);
+        }
+        if (gaugeDashCpu != null) {
+            gaugeDashCpu.setData(Math.min(100f, tempCelsius * 2.2f), "4.32GHz", "SD 8 GEN 4", 0xFFF59E0B);
+        }
+        if (bypassFlowView != null) {
+            bypassFlowView.setBypassActive(isBypassActive);
+        }
+
+        if (isBypassActive) {
+            currentBypassState = "BYPASS ACTIVE";
+            textBypassBadge.setText("BYPASS ACTIVE");
+            textBypassBadge.setTextColor(0xFF10B981);
+        } else if (isCharging) {
+            currentBypassState = "CHARGING";
+            textBypassBadge.setText("CHARGING");
+            textBypassBadge.setTextColor(0xFF38BDF8);
+        } else {
+            currentBypassState = "ON BATTERY";
+            textBypassBadge.setText("ON BATTERY");
+            textBypassBadge.setTextColor(0xFFF59E0B);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (batteryReceiver != null) {
+            try {
+                unregisterReceiver(batteryReceiver);
+            } catch (Exception ignored) {}
+            batteryReceiver = null;
+        }
+    }
+
+    private void updateUI() {
+        boolean overlayShowing = JennaOverlayService.isOverlayShowing();
+        btnToggleDexterMain.setText(overlayShowing ? "Hide Dexter" : "Spawn Dexter");
+        textDexterStatusDesc.setText(overlayShowing ? "Dexter is active and floating on your screen." : "Floating pet overlay with active speech bubble and touch pointer.");
+
+        boolean accessibilityActive = JennaAccessibilityService.isRunning();
+        btnAccessibilityHub.setText(accessibilityActive ? "Accessibility Active (Autonomous Engine)" : "Grant Accessibility Permission");
+        btnAccessibilityHub.setTextColor(accessibilityActive ? 0xFF10B981 : 0xFFF59E0B);
+
+        boolean lifelineRunning = JennaForegroundService.isServiceRunning();
+        btnToggleLifelineHub.setText(lifelineRunning ? "Stop 24/7 Lifeline Service" : "Start 24/7 Lifeline Service");
     }
 }
