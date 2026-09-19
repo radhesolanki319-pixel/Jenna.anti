@@ -25,7 +25,8 @@ fi
 
 # 2. Database fallback configuration (SQLite if no PostgreSQL provided)
 if [ -z "$DATABASE_URL" ] || [[ "$DATABASE_URL" == *"localhost"* ]]; then
-    export DATABASE_URL="sqlite+aiosqlite:///app/data/jenna.db"
+    mkdir -p /app/data
+    export DATABASE_URL="sqlite+aiosqlite:////app/data/jenna.db"
     echo "📁 [Jenna Cloud] Using SQLite database at /app/data/jenna.db"
 fi
 

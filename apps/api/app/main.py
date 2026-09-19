@@ -127,6 +127,18 @@ def create_app() -> FastAPI:
 
 
 
+    @app.get("/")
+    @app.head("/")
+    async def root():
+        return {
+            "message": "Jenna AI Cloud is Live 24/7!",
+            "status": "online",
+            "service": "jenna-api",
+            "whatsapp": "connected",
+            "docs": "/api/docs",
+            "health": "/health",
+        }
+
     @app.get("/health")
     async def root_health():
         return {"status": "ok", "service": "jenna-api", "antigravity": "active", "whatsapp": "active"}
