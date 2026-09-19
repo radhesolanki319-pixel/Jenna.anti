@@ -58,5 +58,7 @@ ENV APP_ENV=production
 ENV AI_PROVIDER=gemini
 ENV AI_MODEL=gemini-2.5-flash
 ENV GOOGLE_API_KEY=AQ.Ab8RN6IH2vG9vQGEwhWOARpGcrJzbYKRGWZd6vtPAkQ0Of0zOQ
+ENV APP_SECRET=jenna-secure-production-secret-9842a84d29
+ENV SESSION_SECRET=jenna-session-secure-key-8319fbc72a91
 
 CMD ["/bin/bash", "/app/start_cloud.sh"]
