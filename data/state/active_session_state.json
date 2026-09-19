@@ -1,15 +1,26 @@
 {
-  "last_active_user": "12249431322776@lid",
-  "last_interaction_time": "2026-09-19T02:34:29.641690+00:00",
-  "last_user_message": "Kya hua",
-  "last_assistant_response": "Kuch nahi Boss, main bas workspace ki current state inspect kar rahi thi taaki hum bina kisi delay ke seedhe action par jump kar sakein! 💻✨\n\nBataiye, abhi kis cheez par focus karna hai? Koi naya featu",
-  "status": "ONLINE",
-  "resume_point": "READY_FOR_NEXT_INSTRUCTION",
-  "active_ecosystem": {
+  "checkpoint_time": "2026-09-19T07:11:45.269606+00:00",
+  "status": "HEALTHY",
+  "battery": {
+    "present": true,
+    "technology": "Li-poly",
+    "health": "GOOD",
+    "plugged": "UNPLUGGED",
+    "status": "DISCHARGING",
+    "temperature": 38.8,
+    "voltage": 4074,
+    "current": -603000,
+    "current_average": -850633,
+    "percentage": 70,
+    "level": 70,
+    "scale": 100,
+    "charge_counter": 2037000,
+    "cycle": 341
+  },
+  "uptime_seconds": 301467.534576299,
+  "active_services": {
     "fastapi": "http://127.0.0.1:8000",
     "nextjs_web": "http://127.0.0.1:3001",
-    "whatsapp_bridge": "http://127.0.0.1:3000",
-    "postgres": "port 5432",
-    "redis": "port 6379"
+    "whatsapp_bridge": "http://127.0.0.1:3000"
   }
 }

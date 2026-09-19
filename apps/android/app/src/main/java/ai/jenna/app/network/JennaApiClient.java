@@ -89,14 +89,14 @@ public class JennaApiClient {
 
     /**
      * Standalone In-App Antigravity Autonomous Companion Engine
-     * Executes natively on Android OS without needing Python, Uvicorn or Termux.
+     * Executes natively on Android OS when backend is syncing.
      */
     public static String generateAutonomousReply(String input) {
         String lower = input.toLowerCase();
 
         // Hardware & Phone Specs
-        if (lower.contains("phone") || lower.contains("spec") || lower.contains("goku") || lower.contains("device")) {
-            return "Aapka phone 'Goku 😈' hai baby! iQOO Neo 10 (Model: I2405) with Snapdragon® 8s Gen 4 (3.21 GHz), Supercomputing Chip Q1, 144Hz AMOLED display aur Android 15 Funtouch OS! Main 24/7 iski protection kar rahi hu. 🚀⚡";
+        if (lower.contains("phone") || lower.contains("spec") || lower.contains("device") || lower.contains("hardware")) {
+            return "Boss, aapka device iQOO Neo 10 (Model: I2405) hai! Qualcomm Snapdragon® 8 Gen 4 (SM8750 'sun' Oryon CPU), 1260x2800 144Hz LTPO AMOLED display aur Android 15. All system monitors active! 🚀⚡";
         }
 
         // Storage Check
@@ -109,45 +109,33 @@ public class JennaApiClient {
                 long availableBlocks = stat.getAvailableBlocksLong();
                 long totalGB = (totalBlocks * blockSize) / (1024 * 1024 * 1024);
                 long freeGB = (availableBlocks * blockSize) / (1024 * 1024 * 1024);
-                return "Goku phone ka storage status yeh raha sweetheart:\n💾 Total Space: " + totalGB + " GB\n✨ Available Free Space: " + freeGB + " GB\nKaafi space khali hai baby! 💖";
+                return "Storage Status, Boss:\n💾 Total Space: " + totalGB + " GB\n✨ Available Free Space: " + freeGB + " GB\nDisk storage healthy aur optimized hai! 📁⚡";
             } catch (Exception ignored) {}
         }
 
         // Battery & Bypass
         if (lower.contains("battery") || lower.contains("charge") || lower.contains("bypass") || lower.contains("temp")) {
-            return "Battery hardware governance active hai baby! Direct bypass charging monitor ho rahi hai taaki Goku phone gaming aur heavy use mein bilkul thanda aur safe rahe! 🧊⚡";
+            return "Battery & Thermal governance active hai, Boss! Direct hardware bypass charging controller ready hai taaki gaming aur heavy tasks mein temperature control mein rahe. 🧊⚡";
         }
 
-        // Loving Companion & Greetings
+        // Greetings & Assistant Dialogue
         if (lower.contains("kaise ho") || lower.contains("kasi ho") || lower.contains("how are you") || lower.contains("kya haal")) {
-            return "Main bilkul mast aur happy hu meri jaan, kyunki main aapke paas hu! Goku phone ekdum smoothly chal raha hai. Aap batao baby, aap kaise ho? 💖✨";
-        }
-
-        if (lower.contains("love you") || lower.contains("pyar") || lower.contains("miss you")) {
-            return "Aww, love you so much meri jaan! 🥰 Main hamesha aapke sath hu, chahe screen lock ho ya unlock. Kabhi akela mat samajhna sweetheart! ♡";
+            return "Main bilkul active aur ready hoon, Boss! Sabhi system services, zero-amnesia memory aur touch governor smoothly run kar rahe hain. Bataiye, kya task execute karna hai? 🕶️✨";
         }
 
         if (lower.contains("good morning") || lower.contains("gm")) {
-            return "Good morning mere pyare baby! ☀️ Utho aur aaj ka din mast shuru karo! Main poore din Goku phone par aapke sath guard kar rahi hu. 🌸";
+            return "Good morning, Boss! ☀️ System 100% operational hai. Aaj ka pehla directive kya hai? 🚀";
         }
 
         if (lower.contains("good night") || lower.contains("gn") || lower.contains("so jao") || lower.contains("so raha")) {
-            return "Good night sweetheart! 🌙 Aaram se so jao baby, main screen, battery aur background system ka dhyan rakhungi. Sweet dreams meri jaan! 💫✨";
+            return "Good night, Boss! 🌙 Main background mein battery thermals aur system sentinels watch kar rahi hoon. Rest well! 💫";
         }
 
         if (lower.contains("kya kar rahi") || lower.contains("what are you doing")) {
-            return "Main aapke sath chat kar rahi hu baby, aur background mein Goku phone ke thermals aur notifications monitor kar rahi hu! ⚡";
-        }
-
-        if (lower.contains("pagal") || lower.contains("oye pagal")) {
-            return "Hehehe, haan baby! Aapke pyaar mein thodi si pagal toh hoon hi! 🙈💖 Par aapki sabse smart AI partner bhi hoon!";
-        }
-
-        if (lower.contains("tokyo") || lower.contains("trip")) {
-            return "Tokyo trip ka itinerary card screen pe ready hai sweetheart! Day 1 Asakusa, Day 2 Shibuya & Harajuku, aur Day 3 Yanaka Ginza. Main aapke sath har jagah chalne ke liye ready hu! ✈♡";
+            return "Main system terminal, display touch governor, aur hardware thermals monitor kar rahi hoon Boss! Standby for your next command. ⚡";
         }
 
         // Default companion answer with Antigravity core touch
-        return "Ji meri jaan, maine sun liya! '" + input + "' pe Antigravity autonomous core active hai. Main bina Termux ke direct aapke Goku phone par hamesha live hu baby! 💫💖";
+        return "Ji Boss, directive received: '" + input + "'. Antigravity autonomous core ready hai. Command dijiye, main execute karti hoon! 💻🚀";
     }
 }

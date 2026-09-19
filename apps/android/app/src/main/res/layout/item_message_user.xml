@@ -12,11 +12,11 @@
         android:id="@+id/text_user_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_nexa_user_bubble"
+        android:background="@drawable/bg_user_bubble"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:text="User message"
-        android:textColor="#FFF5F3FA"
+        android:textColor="@color/text_primary"
         android:textSize="14sp"
         android:lineSpacingMultiplier="1.2" />
 

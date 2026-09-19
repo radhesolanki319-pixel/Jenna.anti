@@ -1,9 +1,14 @@
 package ai.jenna.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
+import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,47 +20,51 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.json.JSONObject;
 
 import ai.jenna.app.db.JennaDbHelper;
 import ai.jenna.app.network.JennaApiClient;
-import ai.jenna.app.network.JennaCallback;
 import ai.jenna.app.services.JennaForegroundService;
+import ai.jenna.app.services.JennaOverlayService;
+import ai.jenna.app.terminal.ShellExecutor;
 import ai.jenna.app.voice.JennaVoice;
 
-public class MainActivity extends Activity implements View.OnClickListener, JennaCallback, TextView.OnEditorActionListener {
+public class MainActivity extends Activity implements View.OnClickListener, TextView.OnEditorActionListener, DialogInterface.OnClickListener {
 
-    // 1. Screens
-    private View layoutNexaSplash;
-    private View layoutNexaChat;
-    private Button btnGetStarted;
+    private static final int REQUEST_CODE_SPEECH = 1001;
 
-    // 2. Chat Header
-    private ImageView btnChatBack;
-    private ImageView nexaChatAvatar;
-    private ImageView btnNexaNotes;
-    private ImageView btnNexaSettings;
+    // Header Views
+    private ImageView headerAvatar;
+    private TextView textHeaderStatus;
+    private Button btnQuickRefresh;
+    private Button btnQuickDexter;
+    private Button btnQuickTerminal;
 
-    // 3. Chat Feed & Accordions
+    // Chips
+    private Button chipStatus;
+    private Button chipBattery;
+    private Button chipStorage;
+    private Button chipVoiceToggle;
+    private Button chipClearChat;
+
+    // Chat Area
     private ScrollView chatScrollView;
-    private LinearLayout chatMessagesContainer;
     private LinearLayout dynamicMessagesContainer;
-    private LinearLayout cardDay1;
-    private LinearLayout cardDay2;
-    private LinearLayout cardDay3;
-    private TextView descDay1;
-    private TextView descDay2;
-    private TextView descDay3;
 
-    // 4. Composer Dock
-    private ImageView btnDockPlus;
-    private EditText inputChatMessage;
-    private ImageView btnDockGallery;
+    // Composer
     private ImageView btnVoiceMic;
+    private EditText inputChatMessage;
     private ImageView btnSendChat;
 
+    // State
     private boolean isVoiceEnabled = true;
+    private boolean is144Hz = true;
+    private TextView currentPendingView;
+    private EditText terminalDialogInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,54 +76,45 @@ public class MainActivity extends Activity implements View.OnClickListener, Jenn
         startCompanionLifeline();
         loadSavedHistory();
 
-        // Initialize voice engine
+        // Warm-up voice engine
         JennaVoice.getInstance(this);
     }
 
     private void initViews() {
-        layoutNexaSplash = findViewById(R.id.layout_nexa_splash);
-        layoutNexaChat = findViewById(R.id.layout_nexa_chat);
-        btnGetStarted = findViewById(R.id.btn_get_started);
+        headerAvatar = findViewById(R.id.header_avatar);
+        textHeaderStatus = findViewById(R.id.text_header_status);
+        btnQuickRefresh = findViewById(R.id.btn_quick_refresh);
+        btnQuickDexter = findViewById(R.id.btn_quick_dexter);
+        btnQuickTerminal = findViewById(R.id.btn_quick_terminal);
 
-        btnChatBack = findViewById(R.id.btn_chat_back);
-        nexaChatAvatar = findViewById(R.id.nexa_chat_avatar);
-        btnNexaNotes = findViewById(R.id.btn_nexa_notes);
-        btnNexaSettings = findViewById(R.id.btn_nexa_settings);
+        chipStatus = findViewById(R.id.chip_status);
+        chipBattery = findViewById(R.id.chip_battery);
+        chipStorage = findViewById(R.id.chip_storage);
+        chipVoiceToggle = findViewById(R.id.chip_voice_toggle);
+        chipClearChat = findViewById(R.id.chip_clear_chat);
 
         chatScrollView = findViewById(R.id.chat_scroll_view);
-        chatMessagesContainer = findViewById(R.id.chat_messages_container);
         dynamicMessagesContainer = findViewById(R.id.dynamic_messages_container);
-        cardDay1 = findViewById(R.id.card_day_1);
-        cardDay2 = findViewById(R.id.card_day_2);
-        cardDay3 = findViewById(R.id.card_day_3);
-        descDay1 = findViewById(R.id.desc_day_1);
-        descDay2 = findViewById(R.id.desc_day_2);
-        descDay3 = findViewById(R.id.desc_day_3);
 
-        btnDockPlus = findViewById(R.id.btn_dock_plus);
-        inputChatMessage = findViewById(R.id.input_chat_message);
-        btnDockGallery = findViewById(R.id.btn_dock_gallery);
         btnVoiceMic = findViewById(R.id.btn_voice_mic);
+        inputChatMessage = findViewById(R.id.input_chat_message);
         btnSendChat = findViewById(R.id.btn_send_chat);
     }
 
     private void setupListeners() {
-        if (btnGetStarted != null) btnGetStarted.setOnClickListener(this);
-        if (btnChatBack != null) btnChatBack.setOnClickListener(this);
-        if (btnNexaNotes != null) btnNexaNotes.setOnClickListener(this);
-        if (btnNexaSettings != null) btnNexaSettings.setOnClickListener(this);
-        if (cardDay1 != null) cardDay1.setOnClickListener(this);
-        if (cardDay2 != null) cardDay2.setOnClickListener(this);
-        if (cardDay3 != null) cardDay3.setOnClickListener(this);
+        btnQuickRefresh.setOnClickListener(this);
+        btnQuickDexter.setOnClickListener(this);
+        btnQuickTerminal.setOnClickListener(this);
 
-        if (btnDockPlus != null) btnDockPlus.setOnClickListener(this);
-        if (btnDockGallery != null) btnDockGallery.setOnClickListener(this);
-        if (btnVoiceMic != null) btnVoiceMic.setOnClickListener(this);
-        if (btnSendChat != null) btnSendChat.setOnClickListener(this);
+        chipStatus.setOnClickListener(this);
+        chipBattery.setOnClickListener(this);
+        chipStorage.setOnClickListener(this);
+        chipVoiceToggle.setOnClickListener(this);
+        chipClearChat.setOnClickListener(this);
 
-        if (inputChatMessage != null) {
-            inputChatMessage.setOnEditorActionListener(this);
-        }
+        btnVoiceMic.setOnClickListener(this);
+        btnSendChat.setOnClickListener(this);
+        inputChatMessage.setOnEditorActionListener(this);
     }
 
     private void startCompanionLifeline() {
@@ -131,71 +131,221 @@ public class MainActivity extends Activity implements View.OnClickListener, Jenn
 
     private void loadSavedHistory() {
         try {
-            List<JennaDbHelper.SavedMessage> messages = JennaDbHelper.getInstance(this).getRecentMessages(30);
-            for (JennaDbHelper.SavedMessage msg : messages) {
-                if ("user".equalsIgnoreCase(msg.sender)) {
-                    appendUserMessageUI(msg.text);
-                } else {
-                    appendNexaMessageUI(msg.text);
+            List<JennaDbHelper.SavedMessage> messages = JennaDbHelper.getInstance(this).getRecentMessages(40);
+            if (messages.isEmpty()) {
+                appendJennaMessageUI("System online, Boss! 🕶️⚡\nQualcomm Snapdragon 8 Gen 4 hardware governance active. Display locked at 144Hz. Bataiye, kya execute karna hai?");
+            } else {
+                for (JennaDbHelper.SavedMessage msg : messages) {
+                    if ("user".equalsIgnoreCase(msg.sender)) {
+                        appendUserMessageUI(msg.text);
+                    } else {
+                        appendJennaMessageUI(msg.text);
+                    }
                 }
             }
+            scrollToBottom();
         } catch (Exception ignored) {}
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.btn_get_started) {
-            layoutNexaSplash.setVisibility(View.GONE);
-            layoutNexaChat.setVisibility(View.VISIBLE);
-            scrollToBottom();
-        } else if (id == R.id.btn_chat_back) {
-            layoutNexaChat.setVisibility(View.GONE);
-            layoutNexaSplash.setVisibility(View.VISIBLE);
-        } else if (id == R.id.card_day_1) {
-            toggleAccordion(descDay1);
-        } else if (id == R.id.card_day_2) {
-            toggleAccordion(descDay2);
-        } else if (id == R.id.card_day_3) {
-            toggleAccordion(descDay3);
-        } else if (id == R.id.btn_send_chat) {
+        if (id == R.id.btn_send_chat) {
             sendMessage();
         } else if (id == R.id.btn_voice_mic) {
-            isVoiceEnabled = !isVoiceEnabled;
-            String msg = isVoiceEnabled ? "Jenna Voice Audio ON 🔊💖" : "Jenna Voice Audio Muted 🔇";
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.btn_dock_gallery) {
-            Toast.makeText(this, "Attach photo / screenshot from Gallery 📸", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.btn_dock_plus) {
-            Toast.makeText(this, "Terminal: Type '!command' to run shell commands in app 💻", Toast.LENGTH_LONG).show();
-        } else if (id == R.id.btn_nexa_notes) {
-            Toast.makeText(this, "Goku 😈 Zero-Amnesia Memory: " + JennaDbHelper.getInstance(this).getRecentMessages(100).size() + " messages saved", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.btn_nexa_settings) {
-            Toast.makeText(this, "Jenna 24/7 Lifeline Active • Goku 😈 Protected", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void toggleAccordion(TextView view) {
-        if (view == null) return;
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
+            startSpeechRecognition();
+        } else if (id == R.id.btn_quick_refresh) {
+            toggleRefreshRate();
+        } else if (id == R.id.btn_quick_dexter) {
+            toggleDexterOverlay();
+        } else if (id == R.id.btn_quick_terminal) {
+            showTerminalDialog();
+        } else if (id == R.id.chip_status) {
+            executeAndDisplayCommand("📊 System Diagnostics", "uptime && getprop ro.product.model");
+        } else if (id == R.id.chip_battery) {
+            executeAndDisplayCommand("🔋 Snapdragon Thermal & Battery", "dumpsys battery | grep -E 'level|temperature|status'");
+        } else if (id == R.id.chip_storage) {
+            displayStorageStats();
+        } else if (id == R.id.chip_voice_toggle) {
+            toggleVoice();
+        } else if (id == R.id.chip_clear_chat) {
+            dynamicMessagesContainer.removeAllViews();
+            appendJennaMessageUI("Chat view cleared, Boss. Persistent memory intact on disk! 🛡️");
         }
     }
 
     private void sendMessage() {
-        if (inputChatMessage == null) return;
         String text = inputChatMessage.getText().toString().trim();
         if (text.isEmpty()) return;
 
-        appendUserMessage(text);
         inputChatMessage.setText("");
-
-        // Save in persistent database
+        appendUserMessageUI(text);
         JennaDbHelper.getInstance(this).saveMessage("user", text, "app");
+        scrollToBottom();
 
-        JennaApiClient.sendChatMessage(text, this);
+        // Check if command
+        if (text.startsWith("!") || text.startsWith("sh:")) {
+            String cmd = text.replaceFirst("^(!|sh:)\\s*", "");
+            executeAndDisplayCommand("💻 Terminal: " + cmd, cmd);
+            return;
+        }
+
+        // Add pending view
+        currentPendingView = appendPendingJennaMessageUI();
+        scrollToBottom();
+
+        JennaApiClient.sendChatMessage(text, new JennaApiHandler(this));
+    }
+
+    public void onApiSuccess(String result) {
+        String reply = extractResponseText(result);
+        if (currentPendingView != null) {
+            currentPendingView.setText(reply);
+        }
+        JennaDbHelper.getInstance(this).saveMessage("jenna", reply, "app");
+        scrollToBottom();
+
+        if (isVoiceEnabled) {
+            JennaVoice.getInstance(this).speak(reply);
+        }
+    }
+
+    public void onApiError(String error) {
+        String fallback = JennaApiClient.generateAutonomousReply(error);
+        if (currentPendingView != null) {
+            currentPendingView.setText(fallback);
+        }
+        JennaDbHelper.getInstance(this).saveMessage("jenna", fallback, "app");
+        scrollToBottom();
+    }
+
+    private String extractResponseText(String jsonOrText) {
+        if (jsonOrText == null) return "Directive received, Boss.";
+        try {
+            JSONObject obj = new JSONObject(jsonOrText);
+            if (obj.has("response")) {
+                return obj.getString("response");
+            }
+        } catch (Exception ignored) {}
+        return jsonOrText;
+    }
+
+    private void startSpeechRecognition() {
+        try {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to Jenna...");
+            startActivityForResult(intent, REQUEST_CODE_SPEECH);
+        } catch (Exception e) {
+            Toast.makeText(this, "Speech recognition: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SPEECH && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && !matches.isEmpty()) {
+                inputChatMessage.setText(matches.get(0));
+                sendMessage();
+            }
+        }
+    }
+
+    private void toggleRefreshRate() {
+        is144Hz = !is144Hz;
+        int mode = is144Hz ? 1 : 0;
+        String label = is144Hz ? "144.0 Hz" : "60.0 Hz";
+        new Thread(new RefreshRateTask(this, mode, label)).start();
+    }
+
+    public void onRefreshRateToggled(boolean is144, String label) {
+        btnQuickRefresh.setText(is144 ? "⚡ 144Hz" : "⚡ 60Hz");
+        textHeaderStatus.setText("Snapdragon 8 Gen 4 • " + label);
+        appendJennaMessageUI("Display refresh rate toggled: " + label + " ⚡");
+        scrollToBottom();
+    }
+
+    private void toggleDexterOverlay() {
+        try {
+            Intent intent = new Intent(this, JennaOverlayService.class);
+            if (JennaOverlayService.isOverlayShowing()) {
+                intent.setAction(JennaOverlayService.ACTION_HIDE);
+                startService(intent);
+                btnQuickDexter.setText("🐾 HUD");
+                appendJennaMessageUI("Dexter Floating HUD dismissed from screen.");
+            } else {
+                intent.setAction(JennaOverlayService.ACTION_SHOW);
+                startService(intent);
+                btnQuickDexter.setText("🐾 Active");
+                appendJennaMessageUI("Dexter Floating HUD spawned onto screen! 🐾✨");
+            }
+            scrollToBottom();
+        } catch (Exception e) {
+            Toast.makeText(this, "Overlay error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showTerminalDialog() {
+        terminalDialogInput = new EditText(this);
+        terminalDialogInput.setHint("e.g. uname -a, ps, free -m");
+        terminalDialogInput.setTextColor(getResources().getColor(R.color.text_primary));
+        terminalDialogInput.setPadding(40, 30, 40, 30);
+
+        new AlertDialog.Builder(this)
+                .setTitle("💻 Shell Command Execution")
+                .setView(terminalDialogInput)
+                .setPositiveButton("Execute", this)
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == DialogInterface.BUTTON_POSITIVE && terminalDialogInput != null) {
+            String cmd = terminalDialogInput.getText().toString().trim();
+            if (!cmd.isEmpty()) {
+                executeAndDisplayCommand("💻 Terminal: " + cmd, cmd);
+            }
+        }
+    }
+
+    private void executeAndDisplayCommand(String title, String command) {
+        appendUserMessageUI("▶ " + title);
+        TextView pending = appendPendingJennaMessageUI();
+        scrollToBottom();
+        new Thread(new CommandTask(this, command, pending)).start();
+    }
+
+    private void displayStorageStats() {
+        try {
+            File path = Environment.getDataDirectory();
+            StatFs stat = new StatFs(path.getPath());
+            long blockSize = stat.getBlockSizeLong();
+            long totalBlocks = stat.getBlockCountLong();
+            long availableBlocks = stat.getAvailableBlocksLong();
+            long totalGB = (totalBlocks * blockSize) / (1024 * 1024 * 1024);
+            long freeGB = (availableBlocks * blockSize) / (1024 * 1024 * 1024);
+
+            String info = "💾 Storage Diagnostics:\n• Total Capacity: " + totalGB + " GB\n• Free Available: " + freeGB + " GB\n• Used: " + (totalGB - freeGB) + " GB";
+            appendJennaMessageUI(info);
+            scrollToBottom();
+        } catch (Exception e) {
+            appendJennaMessageUI("Storage check error: " + e.getMessage());
+        }
+    }
+
+    private void toggleVoice() {
+        isVoiceEnabled = !isVoiceEnabled;
+        chipVoiceToggle.setText(isVoiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: MUTED");
+        Toast.makeText(this, isVoiceEnabled ? "Voice Notes Enabled 🔊" : "Voice Notes Muted 🔇", Toast.LENGTH_SHORT).show();
+    }
+
+    public void appendJennaMessage(String text) {
+        appendJennaMessageUI(text);
+        scrollToBottom();
     }
 
     public void appendUserMessage(String text) {
@@ -204,37 +354,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Jenn
     }
 
     private void appendUserMessageUI(String text) {
-        if (dynamicMessagesContainer == null) return;
         LayoutInflater inflater = LayoutInflater.from(this);
-        View userView = inflater.inflate(R.layout.item_message_user, dynamicMessagesContainer, false);
-        TextView tv = userView.findViewById(R.id.text_user_content);
-        if (tv != null) tv.setText(text);
-        dynamicMessagesContainer.addView(userView);
+        View view = inflater.inflate(R.layout.item_message_user, dynamicMessagesContainer, false);
+        TextView tv = view.findViewById(R.id.text_user_content);
+        tv.setText(text);
+        dynamicMessagesContainer.addView(view);
     }
 
-    public void appendNexaMessage(String text) {
-        appendNexaMessageUI(text);
-        scrollToBottom();
-
-        // Save Jenna reply in persistent database
-        JennaDbHelper.getInstance(this).saveMessage("jenna", text, "app");
-
-        // Speak if voice enabled
-        if (isVoiceEnabled) {
-            JennaVoice.getInstance(this).speak(text);
-        }
-    }
-
-    private void appendNexaMessageUI(String text) {
-        if (dynamicMessagesContainer == null) return;
+    private void appendJennaMessageUI(String text) {
         LayoutInflater inflater = LayoutInflater.from(this);
-        View nexaView = inflater.inflate(R.layout.item_message_jenna, dynamicMessagesContainer, false);
-        TextView tv = nexaView.findViewById(R.id.text_jenna_content);
-        if (tv != null) tv.setText(text);
-        dynamicMessagesContainer.addView(nexaView);
+        View view = inflater.inflate(R.layout.item_message_jenna, dynamicMessagesContainer, false);
+        TextView tv = view.findViewById(R.id.text_jenna_content);
+        tv.setText(text);
+        dynamicMessagesContainer.addView(view);
     }
 
-    public void scrollToBottom() {
+    private TextView appendPendingJennaMessageUI() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.item_message_jenna, dynamicMessagesContainer, false);
+        TextView tv = view.findViewById(R.id.text_jenna_content);
+        tv.setText("Thinking & processing directive...");
+        dynamicMessagesContainer.addView(view);
+        return tv;
+    }
+
+    private void scrollToBottom() {
         if (chatScrollView != null) {
             chatScrollView.post(new ScrollDownTask(chatScrollView));
         }
@@ -247,32 +391,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Jenn
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onSuccess(final String response) {
-        String reply = response;
-        try {
-            JSONObject json = new JSONObject(response);
-            reply = json.optString("response", "");
-            if (reply.isEmpty()) reply = json.optString("reply", response);
-        } catch (Exception ignored) {}
-        runOnUiThread(new MessageDispatcher(this, reply));
-    }
-
-    @Override
-    public void onError(final Throwable error) {
-        runOnUiThread(new MessageDispatcher(this, "I'm right here with you, Senpai! Always connected locally. ♡"));
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (layoutNexaChat != null && layoutNexaChat.getVisibility() == View.VISIBLE) {
-            layoutNexaChat.setVisibility(View.GONE);
-            if (layoutNexaSplash != null) layoutNexaSplash.setVisibility(View.VISIBLE);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override

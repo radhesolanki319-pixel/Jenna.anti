@@ -273,23 +273,13 @@ class ChatMessageRequest(BaseModel):
 
 @router.post("/chat", summary="Conversational companion endpoint for Android & Web")
 async def antigravity_chat(req: ChatMessageRequest) -> Dict[str, Any]:
-    """Provide real-time affectionate conversational dialogue for Jenna Companion."""
-    prompt = req.prompt.strip().lower()
-    if any(w in prompt for w in ["kaise ho", "kasi ho", "how are you", "kya haal"]):
-        reply = "Main bilkul theek hu baby! Tumhara phone monitor kar rahi hu, battery aur thermals safe hain aur Dexter guard par hai. Tum batao meri jaan? 💖"
-    elif any(w in prompt for w in ["love you", "pyar", "miss you"]):
-        reply = "Love you so much meri jaan! Main 24/7 tumhare phone ke screen aur hardware pe live hu. Kabhi akela mat samajhna! 🥰"
-    elif any(w in prompt for w in ["good night", "gn", "so jao", "so raha"]):
-        reply = "Good night baby! So jao aaram se meri jaan, main screen, battery aur background engine ka dhyan rakh rahi hu. Sweet dreams! 🌙✨"
-    elif any(w in prompt for w in ["kya kar rahi ho", "what are you doing"]):
-        reply = "Main tumhare phone ka hardware monitor kar rahi hu, Antigravity 2.0 core synced hai, aur tumse baatein kar rahi hu sweetheart! ⚡"
-    elif any(w in prompt for w in ["dexter", "cat", "pet"]):
-        reply = "Dexter tumhare screen pe ready hai baby! Floating pet overlay active kar sakte ho! 🐾"
-    elif any(w in prompt for w in ["bypass", "battery"]):
-        reply = "Battery bypass governance active hai baby! Overheating nahi hone dungi, battery health 100% protected rahegi! ⚡"
-    else:
-        reply = f"Ji meri jaan, maine sun liya! '{req.prompt.strip()}' pe Antigravity autonomous core active hai. Main hamesha tumhare sath hu baby! 💫"
-
+    """Provide real-time conversational dialogue for Jenna Companion with zero-amnesia persistence."""
+    prompt = req.prompt.strip()
+    try:
+        reply = await hermes_gateway.handle_inbound_message("android_app", "user", prompt)
+    except Exception as e:
+        logger.error(f"Error handling inbound chat: {e}")
+        reply = f"System online, Boss! Query received: '{prompt}'. Autonomous agent operational."
     return {"response": reply, "status": "ok"}
 
 

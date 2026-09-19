@@ -9,17 +9,17 @@
     android:paddingVertical="6dp">
 
     <ImageView
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/nexa_avatar"
-        android:contentDescription="NEXA" />
+        android:src="@drawable/ic_jenna_avatar"
+        android:contentDescription="Jenna AI" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_nexa_bot_bubble"
+        android:background="@drawable/bg_jenna_bubble"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
@@ -27,8 +27,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NEXA"
-            android:textColor="#FFFF2B85"
+            android:text="JENNA"
+            android:textColor="@color/accent_cyan"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -37,8 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="NEXA response"
-            android:textColor="#FFF5F3FA"
+            android:text="Response content"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:lineSpacingMultiplier="1.25" />
 

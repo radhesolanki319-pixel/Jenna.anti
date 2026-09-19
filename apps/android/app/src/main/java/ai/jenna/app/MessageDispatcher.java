@@ -12,7 +12,7 @@ public class MessageDispatcher implements Runnable {
     @Override
     public void run() {
         if (activity != null) {
-            activity.appendNexaMessage(message);
+            activity.appendJennaMessage(message);
         }
     }
 }
