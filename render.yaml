@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jenna-ai-24-7
+    env: docker
+    dockerfilePath: Dockerfile.cloud
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: AI_PROVIDER
+        value: gemini
+      - key: AI_MODEL
+        value: gemini-2.5-flash
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: WHATSAPP_SESSION_B64
+        sync: false

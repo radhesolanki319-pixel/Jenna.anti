@@ -1,0 +1,57 @@
+# ==============================================================================
+# Jenna AI — 24/7 Autonomous Cloud Container (FastAPI + WhatsApp Bridge + Gateway)
+# Optimized for 100% Free Cloud Deployment (Render / Koyeb / Hugging Face Spaces)
+# ==============================================================================
+
+FROM python:3.12-slim
+
+# Prevent interactive prompts during apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+# 1. Install system utilities and Node.js 20 LTS
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    gnupg \
+    build-essential \
+    tar \
+    gzip \
+    procps \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Install Python dependencies
+COPY apps/api/requirements.txt /app/apps/api/requirements.txt
+RUN pip install --no-cache-dir -r /app/apps/api/requirements.txt \
+    && pip install --no-cache-dir aiosqlite
+
+# 3. Install WhatsApp Baileys Bridge dependencies
+COPY whatsapp/bridge/package*.json /app/whatsapp/bridge/
+WORKDIR /app/whatsapp/bridge
+RUN npm install --omit=dev --no-audit --no-fund
+WORKDIR /app
+
+# 4. Copy backend, bridge, scripts, and runtime files
+COPY apps/api /app/apps/api
+COPY whatsapp/bridge /app/whatsapp/bridge
+COPY scripts/run_whatsapp_jenna_daemon.py /app/scripts/run_whatsapp_jenna_daemon.py
+COPY start_cloud.sh /app/start_cloud.sh
+
+# Ensure execute permissions
+RUN chmod +x /app/start_cloud.sh \
+    && mkdir -p /app/whatsapp/session /app/logs /app/data
+
+EXPOSE 8000
+
+ENV PORT=8000
+ENV PYTHONPATH=/app/apps/api
+
+CMD ["/bin/bash", "/app/start_cloud.sh"]

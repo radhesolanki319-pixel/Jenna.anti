@@ -63,3 +63,4 @@ whatsapp/session/
 *.idsig
 apps/android/app/src/main/assets/
 apps/android/build/
+whatsapp_cloud_session.b64

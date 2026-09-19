@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Jenna AI — 24/7 Cloud Entrypoint Supervisor
+# Runs WhatsApp Bridge + Gateway Daemon + FastAPI Backend
+# ==============================================================================
+
+set -e
+
+echo "🚀 [Jenna Cloud] Initializing 24/7 Autonomous Cloud Stack..."
+
+# 1. Restore WhatsApp authenticated session from environment if available
+if [ -n "$WHATSAPP_SESSION_B64" ]; then
+    echo "📦 [Jenna Cloud] Restoring persistent WhatsApp session from WHATSAPP_SESSION_B64..."
+    mkdir -p /app/whatsapp/session
+    echo "$WHATSAPP_SESSION_B64" | base64 -d | tar -xz -C /app/whatsapp/session/ 2>/dev/null || true
+    echo "✅ [Jenna Cloud] WhatsApp session restored successfully!"
+else
+    echo "ℹ️ [Jenna Cloud] No WHATSAPP_SESSION_B64 found. Fresh session or QR pairing will be used."
+fi
+
+# 2. Database fallback configuration (SQLite if no PostgreSQL provided)
+if [ -z "$DATABASE_URL" ] || [[ "$DATABASE_URL" == *"localhost"* ]]; then
+    export DATABASE_URL="sqlite+aiosqlite:///app/data/jenna.db"
+    echo "📁 [Jenna Cloud] Using SQLite database at /app/data/jenna.db"
+fi
+
+# 3. Start Baileys WhatsApp Bridge in the background
+echo "🌉 [Jenna Cloud] Starting WhatsApp Baileys Bridge on port 3000..."
+mkdir -p /app/logs
+node /app/whatsapp/bridge/bridge.js \
+    --port 3000 \
+    --session /app/whatsapp/session \
+    --mode self-chat > /app/logs/whatsapp_bridge.log 2>&1 &
+BRIDGE_PID=$!
+
+# Wait for bridge to become ready
+echo "⏳ [Jenna Cloud] Waiting for bridge health check..."
+for i in {1..30}; do
+    if curl -s http://127.0.0.1:3000/health > /dev/null 2>&1; then
+        echo "✅ [Jenna Cloud] WhatsApp Bridge is healthy (PID $BRIDGE_PID)!"
+        break
+    fi
+    sleep 1
+done
+
+# 4. Start Python WhatsApp Jenna Daemon in the background
+echo "🤖 [Jenna Cloud] Starting WhatsApp Jenna Daemon..."
+export PYTHONPATH="/app/apps/api"
+python3 -u /app/scripts/run_whatsapp_jenna_daemon.py > /app/logs/whatsapp_daemon.log 2>&1 &
+DAEMON_PID=$!
+echo "✅ [Jenna Cloud] WhatsApp Daemon started (PID $DAEMON_PID)!"
+
+# 5. Trap signals for clean container shutdown
+trap "kill -TERM $BRIDGE_PID $DAEMON_PID 2>/dev/null || true; exit 0" SIGINT SIGTERM
+
+# 6. Start FastAPI Backend in the foreground (bind to public container PORT)
+PUBLIC_PORT="${PORT:-8000}"
+echo "🌐 [Jenna Cloud] Starting FastAPI backend on port $PUBLIC_PORT..."
+exec python3 -m uvicorn app.main:app \
+    --app-dir /app/apps/api \
+    --host 0.0.0.0 \
+    --port "$PUBLIC_PORT"
