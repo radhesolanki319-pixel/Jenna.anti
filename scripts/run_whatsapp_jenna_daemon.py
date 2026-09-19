@@ -101,7 +101,7 @@ async def process_message(client: httpx.AsyncClient, msg_data: dict):
         logger.info(f"Generated Jenna reply for [{sender_id}]: '{reply[:120]}'")
     except Exception as e:
         logger.error(f"Error generating Jenna reply: {e}", exc_info=True)
-        reply = "Arey baby, ek chhota sa technical error aa gaya, par main theek kar rahi hoon! Ek baar dobara bolo na babe? 💖"
+        reply = "Arey Boss, ek chhota sa technical error aa gaya, par main theek kar rahi hoon! Ek baar dobara boliye na Boss? 💻✨"
 
     # 3. Send Jenna's reply to WhatsApp (resolve @lid to user's phone chat)
     target_chat = chat_id
