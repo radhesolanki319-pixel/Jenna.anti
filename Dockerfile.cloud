@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gzip \
     procps \
     redis-server \
+    git \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
@@ -46,6 +47,7 @@ COPY whatsapp/bridge /app/whatsapp/bridge
 COPY scripts/run_whatsapp_jenna_daemon.py /app/scripts/run_whatsapp_jenna_daemon.py
 COPY start_cloud.sh /app/start_cloud.sh
 COPY whatsapp_cloud_session.tar.gz* /app/
+COPY .git /app/.git
 
 # Ensure execute permissions
 RUN chmod +x /app/start_cloud.sh \

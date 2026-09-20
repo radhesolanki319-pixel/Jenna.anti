@@ -99,6 +99,10 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 37. doctor_safe_patch: Safely modify or fix a code file with automated sandbox syntax verification (py_compile) and automatic backup snapshot before saving (e.g. {{"target_file": "app/foo.py", "new_content": "...", "description": "Fix bug"}})
 38. doctor_rollback: Rollback any modified file to its previous stable .bak backup snapshot (e.g. {{"target_file": "app/foo.py"}})
 39. doctor_self_deploy: Trigger autonomous cloud redeployment via Render deploy hook to push healed code to production (e.g. {{"reason": "Self-healed bug"}})
+40. git_status: Inspect current Git branch, modified files, and untracked files (e.g. {{}})
+41. git_commit_and_push: Stage modified files, commit with message, and push directly to GitHub main (e.g. {{"message": "Auto-fix by Jenna", "files": ["apps/api/app/foo.py"]}})
+42. render_deploy: Trigger Render cloud build and redeployment (e.g. {{"reason": "Deploy latest updates"}})
+43. autonomous_publish: Complete autonomous pipeline: Stage all changes -> Commit -> Push to GitHub -> Trigger Render Cloud deployment (e.g. {{"commit_message": "Automated update by Jenna"}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -800,6 +804,36 @@ class AntigravityAgent:
                 reason = args.get("reason", "Autonomic self-healing update")
                 res = await autonomic_doctor.trigger_self_deploy(reason)
                 return {"tool": "doctor_self_deploy", **res}
+
+            # 40. git_status
+            elif tool_name in ("git_status", "check_git_status"):
+                from app.services.git_deployment_service import git_deployment_service
+                res = git_deployment_service.get_status()
+                return {"tool": "git_status", **res}
+
+            # 41. git_commit_and_push
+            elif tool_name in ("git_commit_and_push", "github_push", "git_push"):
+                from app.services.git_deployment_service import git_deployment_service
+                msg = args.get("message") or args.get("commit_message", "Update from Jenna AI")
+                files = args.get("files")
+                branch = args.get("branch", "main")
+                res = git_deployment_service.commit_and_push(message=msg, files=files, branch=branch)
+                return {"tool": "git_commit_and_push", **res}
+
+            # 42. render_deploy
+            elif tool_name in ("render_deploy", "trigger_render_deploy"):
+                from app.services.git_deployment_service import git_deployment_service
+                reason = args.get("reason", "Autonomous deployment")
+                res = await git_deployment_service.deploy_to_render(reason=reason)
+                return {"tool": "render_deploy", **res}
+
+            # 43. autonomous_publish
+            elif tool_name in ("autonomous_publish", "publish_to_production"):
+                from app.services.git_deployment_service import git_deployment_service
+                msg = args.get("commit_message") or args.get("message", "Autonomous update by Jenna AI")
+                branch = args.get("branch", "main")
+                res = await git_deployment_service.autonomous_publish(commit_message=msg, branch=branch)
+                return {"tool": "autonomous_publish", **res}
 
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}
