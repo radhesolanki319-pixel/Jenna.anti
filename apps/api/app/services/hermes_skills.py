@@ -92,7 +92,7 @@ class HermesSkillEngine:
                 "tags": ["hardware", "charging", "vivo", "battery"],
                 "version": "1.0.0",
                 "instructions": (
-                    "To manage and check Bypass Charging on iQOO Neo 9 Pro (Snapdragon 8 Gen 2):\n"
+                    "To manage and check Bypass Charging on iQOO / vivo devices (including iQOO Neo 10 / Snapdragon 8s Gen 4):\n"
                     "1. Check current charge level and charging current: `dumpsys battery`\n"
                     "2. Verify thermal temperature (maintain under 38.5°C for optimal gaming)\n"
                     "3. Check battery saver state: `cmd battery set low_power 0`\n"

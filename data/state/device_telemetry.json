@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-09-20T14:35:00+00:00",
+  "brand": "iQOO",
+  "manufacturer": "vivo",
+  "model": "I2405",
+  "device_marketing_name": "iQOO Neo 10",
+  "bbk_model": "PD2453F_EX",
+  "soc_model": "SM8735",
+  "soc_marketing_name": "Qualcomm Snapdragon 8s Gen 4",
+  "platform_board": "sun",
+  "android_version": "15",
+  "sdk_api_level": 35,
+  "kernel": "Linux 6.6.57-android15 aarch64",
+  "display": "6.78-inch 144Hz AMOLED (1.5K 2800x1260)",
+  "battery_capacity": "7,000 mAh",
+  "charging": "Direct Hardware Bypass Charging supported"
+}
