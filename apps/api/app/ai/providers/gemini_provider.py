@@ -130,18 +130,18 @@ class GeminiProvider(BaseAIProvider):
     def _resolve_model(self, model: str | None) -> str:
         if model:
             if model in ("gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.0-flash", "gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"):
-                return "gemini-3.6-flash"
+                return "gemini-flash-lite-latest"
             if model in ("gemini-2.5-pro", "gemini-1.5-pro"):
-                return "gemini-3.6-flash"
+                return "gemini-flash-lite-latest"
             return model
-        return "gemini-3.6-flash"
+        return "gemini-flash-lite-latest"
 
     async def generate(self, request: AIRequest) -> AIResponse:
         self._ensure_available()
         assert self._client is not None
         initial_model = self._resolve_model(request.model)
         candidates = [initial_model]
-        for fallback in ("gemini-3.6-flash", "gemini-flash-lite-latest"):
+        for fallback in ("gemini-flash-lite-latest", "gemini-3.5-flash-lite"):
             if fallback not in candidates:
                 candidates.append(fallback)
 
@@ -214,7 +214,7 @@ class GeminiProvider(BaseAIProvider):
         assert self._client is not None
         initial_model = self._resolve_model(request.model)
         candidates = [initial_model]
-        for fallback in ("gemini-3.6-flash", "gemini-flash-lite-latest"):
+        for fallback in ("gemini-flash-lite-latest", "gemini-3.5-flash-lite"):
             if fallback not in candidates:
                 candidates.append(fallback)
 

@@ -103,6 +103,11 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 41. git_commit_and_push: Stage modified files, commit with message, and push directly to GitHub main (e.g. {{"message": "Auto-fix by Jenna", "files": ["apps/api/app/foo.py"]}})
 42. render_deploy: Trigger Render cloud build and redeployment (e.g. {{"reason": "Deploy latest updates"}})
 43. autonomous_publish: Complete autonomous pipeline: Stage all changes -> Commit -> Push to GitHub -> Trigger Render Cloud deployment (e.g. {{"commit_message": "Automated update by Jenna"}})
+44. phone_execute: Execute any shell command directly on Boss's physical phone via live bridge tunnel (e.g. {{"command": "getprop ro.soc.model"}})
+45. phone_list_files: Browse files and folders directly inside Boss's phone storage (/storage/emulated/0/...) (e.g. {{"path": "/storage/emulated/0/Download"}})
+46. phone_read_file: Read a file directly from Boss's phone storage (e.g. {{"path": "/storage/emulated/0/Download/notes.txt"}})
+47. phone_organize_storage: Safely organize and sort messy files in Boss's phone storage into neat folders (Documents, Images, Audio, Archives) (e.g. {{"folder": "/storage/emulated/0/Download"}})
+48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -835,6 +840,40 @@ class AntigravityAgent:
                 res = await git_deployment_service.autonomous_publish(commit_message=msg, branch=branch)
                 return {"tool": "autonomous_publish", **res}
 
+            # 44. phone_execute
+            elif tool_name in ("phone_execute", "phone_command", "phone_bash"):
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                cmd = args.get("command") or args.get("CommandLine", "")
+                res = await phone_bridge_hub.execute_on_phone("shell", {"command": cmd, "timeout": float(args.get("timeout", 25.0))})
+                return {"tool": "phone_execute", **res}
+
+            # 45. phone_list_files
+            elif tool_name in ("phone_list_files", "phone_ls"):
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                path_str = args.get("path", "/storage/emulated/0/Download")
+                res = await phone_bridge_hub.execute_on_phone("file_list", {"path": path_str, "limit": int(args.get("limit", 60))})
+                return {"tool": "phone_list_files", **res}
+
+            # 46. phone_read_file
+            elif tool_name in ("phone_read_file", "phone_cat"):
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                path_str = args.get("path", "")
+                res = await phone_bridge_hub.execute_on_phone("file_read", {"path": path_str})
+                return {"tool": "phone_read_file", **res}
+
+            # 47. phone_organize_storage
+            elif tool_name in ("phone_organize_storage", "phone_clean_folder"):
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                folder_str = args.get("folder", "/storage/emulated/0/Download")
+                res = await phone_bridge_hub.execute_on_phone("file_organize", {"folder": folder_str})
+                return {"tool": "phone_organize_storage", **res}
+
+            # 48. phone_vitals
+            elif tool_name in ("phone_vitals", "phone_battery", "phone_status"):
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("device_vitals", {})
+                return {"tool": "phone_vitals", **res}
+
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}
 
@@ -946,7 +985,7 @@ class AntigravityAgent:
                 if preferred_model and any(k in preferred_model.lower() for k in ("fable", "astra")):
                     res = await frontier_router.route_and_generate(req, preferred_model=preferred_model)
                 else:
-                    for mod in ["gemini-3.6-flash", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-3.8-flash"]:
+                    for mod in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"]:
                         try:
                             req.model = mod
                             async with asyncio.timeout(15.0):
