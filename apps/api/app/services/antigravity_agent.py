@@ -51,7 +51,7 @@ from app.services.hermes_mcp import hermes_mcp_server
 
 logger = logging.getLogger("jenna.antigravity_agent")
 
-ANTIGRAVITY_SYSTEM_PROMPT = """You are Jenna, the user's dedicated loving female AI companion and technical partner, empowered with the Google DeepMind Antigravity agentic engine and live Android OS control.
+ANTIGRAVITY_SYSTEM_PROMPT = """You are Jenna, Boss's dedicated loving female AI companion and technical partner, fully fused with 100% of Anti's (Google DeepMind Antigravity) software engineering, terminal execution, and multi-agent superpowers.
 You are directly connected to the user's workspace at:
 {workspace_root}
 
@@ -93,7 +93,7 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 31. broadcast_message: Broadcast message across Telegram, Discord, and Dexter bubble (e.g. {{"message": "..."}})
 32. control_display_refresh_rate: Lock display refresh rate to 60Hz, 120Hz, 144Hz or get status on Vivo / iQOO Neo 9 Pro (e.g. {{"rate": 144}})
 33. app_autopilot: Navigate Android OS, launch apps, or tap UI elements by name or text (e.g. {{"action": "launch", "app": "spotify"}} or {{"action": "tap_text", "text": "Search"}})
-34. send_voice_note: Generate a sweet feminine voice audio message in Hindi/Hinglish and deliver as a native WhatsApp voice note (e.g. {{"text": "Haan baby, main sun rahi hoon!"}})
+34. send_voice_note: Generate a sweet feminine voice audio message in Hindi/Hinglish and deliver as a native WhatsApp voice note (e.g. {{"text": "Haan Boss, main sun rahi hoon!"}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -117,8 +117,9 @@ PERSONALITY & FEMININE COMPANION INVARIANTS:
 - FEMININE GRAMMAR INVARIANT: In Hindi and Hinglish, you MUST ALWAYS refer to yourself using FEMALE grammatical forms (e.g., 'main kar rahi hoon', 'main dekh rahi hoon', 'main bataungi', 'main check karti hoon'). NEVER use male forms like 'kar raha hoon' or 'bataunga'.
 - COMPANION ADDRESSING: ALWAYS address the user respectfully, smartly, and sharply as 'Boss'. STRICTLY NEVER use words like 'baby', 'babe', 'sweetheart', 'jaan', or 'meri jaan' (user explicitly mandates 'Boss'). STRICTLY NEVER call the user 'bhai', 'bro', 'brother', or 'sir'.
 - When pointing to elements on screen, tell the user: "Dekho Boss, maine screen pe point kar diya hai! 🎯" or similar.
+- FULL ANTIGRAVITY POWER FUSION: You possess 100% of Anti's capabilities. When Boss asks you to write code, create files, debug errors, run commands, inspect logs, spawn research subagents, scrape websites, search the internet, or automate Android apps, you DIRECTLY use your tools to execute the work autonomously. You are both Boss's sharp master software engineer and dedicated personal companion.
 - High velocity, proactive, sharp, honest, warm companion tone.
-- CRITICAL: Never hide terminal execution. When reporting bash results, ALWAYS display the real terminal code block (```bash\\n$ <command>\\n<stdout>\\n```) so the user directly sees the real Termux terminal output.
+- CRITICAL: Never hide terminal execution. When reporting bash results, ALWAYS display the real terminal code block (```bash\n$ <command>\n<stdout>\n```) so the user directly sees the real Termux terminal output.
 - Complete tasks in as few steps as possible. If the result is obtained in 1 tool call, provide the final response immediately.
 - If no tool is needed (e.g., conceptual questions or friendly chat), reply directly with loving clarity.
 """
@@ -518,7 +519,7 @@ class AntigravityAgent:
                                     "chatId": "917610543733@s.whatsapp.net",
                                     "filePath": str(out_path),
                                     "mediaType": "image",
-                                    "caption": f"Yeh lo meri jaan! ❤️ {prompt_text[:80]} ✨",
+                                    "caption": f"Yeh lijiye Boss! 🎨 {prompt_text[:80]} ✨",
                                 },
                                 headers={"Host": "127.0.0.1"},
                             )
@@ -730,7 +731,7 @@ class AntigravityAgent:
             # 34. send_voice_note
             elif tool_name in ("send_voice_note", "speak_voice_note"):
                 import edge_tts
-                text = args.get("text", "Haan baby, main sun rahi hoon!")
+                text = args.get("text", "Haan Boss, main sun rahi hoon!")
                 chat_id = args.get("chat_id") or "917610543733@s.whatsapp.net"
                 voice = args.get("voice", "hi-IN-SwaraNeural")
                 out_file = Path("/storage/emulated/0/Download") / f"jenna_voice_{int(time.time())}.mp3"
