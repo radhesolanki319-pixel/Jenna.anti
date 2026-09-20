@@ -81,10 +81,26 @@ async def lifespan(app: FastAPI):
             except Exception as e:
                 logger.debug(f"Keep-alive ping: {e}")
 
+    # Autonomic Doctor Background Watchdog Loop
+    async def doctor_watchdog_loop():
+        from app.services.autonomic_doctor import autonomic_doctor
+        while True:
+            try:
+                await asyncio.sleep(60)  # Check every 60 seconds
+                diag = await autonomic_doctor.diagnose_system()
+                if diag.get("status") in ("DEGRADED", "CRITICAL"):
+                    logger.warning(f"Autonomic Doctor Warning: {diag.get('diagnosis_summary')} (Score: {diag.get('health_score')})")
+            except asyncio.CancelledError:
+                break
+            except Exception as d_err:
+                logger.debug(f"Doctor watchdog check error: {d_err}")
+
+    doctor_task = asyncio.create_task(doctor_watchdog_loop())
     keep_alive_task = asyncio.create_task(keep_alive_loop())
     yield
 
     # Clean shutdown
+    doctor_task.cancel()
     keep_alive_task.cancel()
     logger.info("Shutting down API services and disconnecting clients...")
     await redis_client.disconnect()
@@ -173,6 +189,22 @@ def create_app() -> FastAPI:
             "service": "jenna-api",
             "antigravity": "active",
             "whatsapp": wa_status,
+        }
+
+    @app.get("/doctor/diagnose")
+    async def doctor_diagnose_endpoint():
+        """Autonomic Doctor Vitals & Health Diagnosis."""
+        from app.services.autonomic_doctor import autonomic_doctor
+        return await autonomic_doctor.diagnose_system()
+
+    @app.get("/doctor/logs")
+    async def doctor_logs_endpoint(limit: int = 30, level: str | None = None):
+        """Autonomic Doctor Recent Logs & Error Tracebacks."""
+        from app.services.autonomic_doctor import autonomic_doctor
+        logs = autonomic_doctor.inspect_logs(limit=limit, level=level)
+        return {
+            "count": len(logs),
+            "logs": logs,
         }
 
     @app.get("/whatsapp/status")

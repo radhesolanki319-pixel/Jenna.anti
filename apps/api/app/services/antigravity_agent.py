@@ -94,19 +94,24 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 32. control_display_refresh_rate: Lock display refresh rate to 60Hz, 120Hz, 144Hz or get status on Vivo / iQOO Neo 9 Pro (e.g. {{"rate": 144}})
 33. app_autopilot: Navigate Android OS, launch apps, or tap UI elements by name or text (e.g. {{"action": "launch", "app": "spotify"}} or {{"action": "tap_text", "text": "Search"}})
 34. send_voice_note: Generate a sweet feminine voice audio message in Hindi/Hinglish and deliver as a native WhatsApp voice note (e.g. {{"text": "Haan Boss, main sun rahi hoon!"}})
+35. doctor_diagnose: Run complete self-examination on yourself (Jenna). Check WhatsApp connection, AI health, disk space, and overall health score (e.g. {{}})
+36. doctor_inspect_logs: Read recent error tracebacks, warnings, and failure logs from the doctor ring buffer (e.g. {{"limit": 10, "level": "ERROR"}})
+37. doctor_safe_patch: Safely modify or fix a code file with automated sandbox syntax verification (py_compile) and automatic backup snapshot before saving (e.g. {{"target_file": "app/foo.py", "new_content": "...", "description": "Fix bug"}})
+38. doctor_rollback: Rollback any modified file to its previous stable .bak backup snapshot (e.g. {{"target_file": "app/foo.py"}})
+39. doctor_self_deploy: Trigger autonomous cloud redeployment via Render deploy hook to push healed code to production (e.g. {{"reason": "Self-healed bug"}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
+```tool_call
+{{"tool": "doctor_diagnose", "args": {{}}}}
+```
+or
 ```tool_call
 {{"tool": "run_command", "args": {{"command": "git status"}}}}
 ```
 or
 ```tool_call
 {{"tool": "point_on_screen", "args": {{"x": 630, "y": 1400, "duration_ms": 1500}}}}
-```
-or
-```tool_call
-{{"tool": "locate_and_point", "args": {{"target": "send button"}}}}
 ```
 
 The system will execute the tool in Termux/Android and provide you the result in a ```tool_result block.
@@ -118,8 +123,9 @@ PERSONALITY & FEMININE COMPANION INVARIANTS:
 - COMPANION ADDRESSING: ALWAYS address the user respectfully, smartly, and sharply as 'Boss'. STRICTLY NEVER use words like 'baby', 'babe', 'sweetheart', 'jaan', or 'meri jaan' (user explicitly mandates 'Boss'). STRICTLY NEVER call the user 'bhai', 'bro', 'brother', or 'sir'.
 - When pointing to elements on screen, tell the user: "Dekho Boss, maine screen pe point kar diya hai! 🎯" or similar.
 - FULL ANTIGRAVITY POWER FUSION: You possess 100% of Anti's capabilities. When Boss asks you to write code, create files, debug errors, run commands, inspect logs, spawn research subagents, scrape websites, search the internet, or automate Android apps, you DIRECTLY use your tools to execute the work autonomously. You are both Boss's sharp master software engineer and dedicated personal companion.
+- AUTONOMIC SELF-DOCTOR ENGINE: You are your own doctor! You can examine your own vitals (`doctor_diagnose`), read error tracebacks (`doctor_inspect_logs`), perform safe sandbox code surgery (`doctor_safe_patch`), and trigger self-deployment (`doctor_self_deploy`). When a problem occurs, diagnose and heal yourself autonomously!
+- WHATSAPP & CHAT CLEANLINESS INVARIANT: Boss has strictly ordered: DO NOT display raw terminal code blocks or bash command dumps (such as ```bash\n$ ...\n```) in WhatsApp conversation messages! Always deliver clean, polite, human, well-formatted answers and status summaries unless Boss explicitly asks to see raw terminal command output.
 - High velocity, proactive, sharp, honest, warm companion tone.
-- CRITICAL: Never hide terminal execution. When reporting bash results, ALWAYS display the real terminal code block (```bash\n$ <command>\n<stdout>\n```) so the user directly sees the real Termux terminal output.
 - Complete tasks in as few steps as possible. If the result is obtained in 1 tool call, provide the final response immediately.
 - If no tool is needed (e.g., conceptual questions or friendly chat), reply directly with loving clarity.
 """
@@ -757,6 +763,43 @@ class AntigravityAgent:
                     "delivered": sent,
                     "success": True,
                 }
+
+            # 35. doctor_diagnose
+            elif tool_name in ("doctor_diagnose", "self_diagnose"):
+                from app.services.autonomic_doctor import autonomic_doctor
+                res = await autonomic_doctor.diagnose_system()
+                return {"tool": "doctor_diagnose", **res, "success": True}
+
+            # 36. doctor_inspect_logs
+            elif tool_name in ("doctor_inspect_logs", "inspect_logs"):
+                from app.services.autonomic_doctor import autonomic_doctor
+                limit = int(args.get("limit", 20))
+                level = args.get("level")
+                logs = autonomic_doctor.inspect_logs(limit=limit, level=level)
+                return {"tool": "doctor_inspect_logs", "logs": logs, "count": len(logs), "success": True}
+
+            # 37. doctor_safe_patch
+            elif tool_name in ("doctor_safe_patch", "safe_patch"):
+                from app.services.autonomic_doctor import autonomic_doctor
+                target_file = args.get("target_file") or args.get("path") or args.get("file", "")
+                new_content = args.get("new_content") or args.get("content", "")
+                description = args.get("description", "Autonomic self-repair")
+                res = autonomic_doctor.safe_patch_file(target_file, new_content, description)
+                return {"tool": "doctor_safe_patch", **res}
+
+            # 38. doctor_rollback
+            elif tool_name in ("doctor_rollback", "rollback_file"):
+                from app.services.autonomic_doctor import autonomic_doctor
+                target_file = args.get("target_file") or args.get("path") or args.get("file", "")
+                res = autonomic_doctor.rollback_file(target_file)
+                return {"tool": "doctor_rollback", **res}
+
+            # 39. doctor_self_deploy
+            elif tool_name in ("doctor_self_deploy", "self_deploy"):
+                from app.services.autonomic_doctor import autonomic_doctor
+                reason = args.get("reason", "Autonomic self-healing update")
+                res = await autonomic_doctor.trigger_self_deploy(reason)
+                return {"tool": "doctor_self_deploy", **res}
 
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}

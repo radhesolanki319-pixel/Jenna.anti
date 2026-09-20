@@ -174,10 +174,14 @@ class HermesMessagingGateway:
             elif event.get("type") == "agent.final_response":
                 final_content = event.get("content", "")
 
-        response_text = (final_content or "".join(accumulated)).strip() or "Haan Boss, main sun rahi hoon! 🚀"
+        response_text = (final_content if final_content else "".join(accumulated)).strip() or "Haan Boss, main sun rahi hoon! 🚀"
         
         # Enforce user preference: STRICTLY address user as Boss, NEVER use baby / jaan / meri jaan
         response_text = re.sub(r"\b(meri\s+jaan|jaan|baby|babe|sweetheart|darling)\b", "Boss", response_text, flags=re.IGNORECASE)
+
+        # Boss explicitly mandated: Never show raw bash code blocks in WhatsApp chat
+        if platform == "whatsapp" and not any(kw in message.lower() for kw in ("show code", "code dikhao", "bash dikhao", "terminal dikhao", "command output")):
+            response_text = re.sub(r"```(?:bash|sh)\s*[\s\S]*?```\n*", "", response_text).strip()
 
         IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
         now_t = datetime.datetime.now(IST)
