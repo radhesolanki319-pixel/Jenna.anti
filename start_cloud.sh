@@ -10,7 +10,7 @@ echo "🚀 [Jenna Cloud] Initializing 24/7 Autonomous Cloud Stack..."
 
 # 0. AI Provider Configuration
 if [ -z "$GOOGLE_API_KEY" ]; then
-    export GOOGLE_API_KEY=$(echo "=Elcp9kQCFnRY5kQJlUNaVUMxkGbNJWL0kFMv9Fb5EXUZ12Q1VVZklzdZl2S24kU4IWQuEVQ" | rev | base64 -d 2>/dev/null || true)
+    export GOOGLE_API_KEY=$(python3 -c "import base64; print(base64.b64decode('=Elcp9kQCFnRY5kQJlUNaVUMxkGbNJWL0kFMv9Fb5EXUZ12Q1VVZklzdZl2S24kU4IWQuEVQ'[::-1]).decode())" 2>/dev/null || true)
 fi
 export AI_MODEL="gemini-3.6-flash"
 
