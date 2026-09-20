@@ -369,6 +369,7 @@ function rememberSentId(id) {
 
 let sock = null;
 let connectionState = 'disconnected';
+let latestQR = null;
 
 function emitPairEvent(event) {
   if (!PAIR_JSON) return;
@@ -424,6 +425,10 @@ async function startSocket() {
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect, qr } = update;
 
+    if (qr) {
+      latestQR = qr;
+    }
+
     if (qr && !PAIR_PHONE) {
       if (PAIR_JSON) {
         emitPairEvent({ event: 'qr', qr });
@@ -469,6 +474,7 @@ async function startSocket() {
       }
     } else if (connection === 'open') {
       connectionState = 'connected';
+      latestQR = null;
       const connectedUser = sock?.user
         ? {
             id: sock.user.id || null,
@@ -1134,6 +1140,22 @@ app.get('/health', (req, res) => {
     scriptHash: SCRIPT_HASH,
     sendReadReceipts: SEND_READ_RECEIPTS,
   });
+});
+
+// Live QR / Auth page
+app.get('/qr', async (req, res) => {
+  if (connectionState === 'connected') {
+    return res.send(`<!DOCTYPE html><html><body style="background:#0f172a;color:#10b981;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;"><h1>✅ WhatsApp is 100% Connected & Active!</h1></body></html>`);
+  }
+  if (!latestQR) {
+    return res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="5"></head><body style="background:#0f172a;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;"><h2>⏳ Connecting or Waiting for QR Code... (Auto-refreshing)</h2></body></html>`);
+  }
+  try {
+    const svg = await QRCode.toString(latestQR, { type: 'svg' });
+    res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="15"><title>Jenna AI WhatsApp Login</title><style>body{background:#0f172a;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}.card{background:#fff;padding:24px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.5)}h2{color:#38bdf8;margin-bottom:8px}p{color:#94a3b8}</style></head><body><h2>📱 Link Jenna AI on WhatsApp</h2><p>WhatsApp &gt; Linked Devices &gt; Link a Device</p><div class="card">${svg}</div><p>Point phone camera here • Auto-refreshes every 15s</p></body></html>`);
+  } catch (err) {
+    res.status(500).send('Error generating QR: ' + err.message);
+  }
 });
 
 // Start

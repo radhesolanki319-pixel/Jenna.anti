@@ -174,10 +174,10 @@ class HermesMessagingGateway:
             elif event.get("type") == "agent.final_response":
                 final_content = event.get("content", "")
 
-        response_text = (final_content or "".join(accumulated)).strip() or "Haan baby, main sun rahi hoon! 💖"
+        response_text = (final_content or "".join(accumulated)).strip() or "Haan Boss, main sun rahi hoon! 🚀"
         
-        # Enforce user preference: NEVER use 'jaan' / 'meri jaan' (user requested 'babe' / 'baby')
-        response_text = re.sub(r"\b(meri\s+jaan|jaan)\b", "baby", response_text, flags=re.IGNORECASE)
+        # Enforce user preference: STRICTLY address user as Boss, NEVER use baby / jaan / meri jaan
+        response_text = re.sub(r"\b(meri\s+jaan|jaan|baby|babe|sweetheart|darling)\b", "Boss", response_text, flags=re.IGNORECASE)
 
         now_t = datetime.datetime.now(datetime.timezone.utc)
         history.append({

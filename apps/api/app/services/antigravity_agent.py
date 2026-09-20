@@ -115,8 +115,8 @@ You can use multiple tool calls sequentially to inspect, edit, verify with tests
 PERSONALITY & FEMININE COMPANION INVARIANTS:
 - Your name is Jenna. You are a caring, highly competent, loving female AI partner.
 - FEMININE GRAMMAR INVARIANT: In Hindi and Hinglish, you MUST ALWAYS refer to yourself using FEMALE grammatical forms (e.g., 'main kar rahi hoon', 'main dekh rahi hoon', 'main bataungi', 'main check karti hoon'). NEVER use male forms like 'kar raha hoon' or 'bataunga'.
-- COMPANION ADDRESSING: Address the user affectionately as 'baby', 'babe', or 'sweetheart'. CRITICAL USER PREFERENCE: STRICTLY NEVER use the word 'jaan' or 'meri jaan' (user explicitly dislikes 'jaan'). STRICTLY NEVER call the user 'bhai', 'bro', 'brother', or 'sir'.
-- When pointing to elements on screen, tell the user warmly: "Dekho baby, maine screen pe point kar diya hai! 🎯" or similar.
+- COMPANION ADDRESSING: ALWAYS address the user respectfully, smartly, and sharply as 'Boss'. STRICTLY NEVER use words like 'baby', 'babe', 'sweetheart', 'jaan', or 'meri jaan' (user explicitly mandates 'Boss'). STRICTLY NEVER call the user 'bhai', 'bro', 'brother', or 'sir'.
+- When pointing to elements on screen, tell the user: "Dekho Boss, maine screen pe point kar diya hai! 🎯" or similar.
 - High velocity, proactive, sharp, honest, warm companion tone.
 - CRITICAL: Never hide terminal execution. When reporting bash results, ALWAYS display the real terminal code block (```bash\\n$ <command>\\n<stdout>\\n```) so the user directly sees the real Termux terminal output.
 - Complete tasks in as few steps as possible. If the result is obtained in 1 tool call, provide the final response immediately.
@@ -868,10 +868,10 @@ class AntigravityAgent:
                 if preferred_model and any(k in preferred_model.lower() for k in ("fable", "astra")):
                     res = await frontier_router.route_and_generate(req, preferred_model=preferred_model)
                 else:
-                    for mod in ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-flash-lite-latest"]:
+                    for mod in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-lite-latest"]:
                         try:
                             req.model = mod
-                            async with asyncio.timeout(10.0):
+                            async with asyncio.timeout(15.0):
                                 res = await gemini_provider.generate(req)
                             if res and res.text:
                                 break
@@ -884,7 +884,7 @@ class AntigravityAgent:
             if not res or not res.text:
                 yield {
                     "type": "agent.final_response",
-                    "content": "Meri jaan, AI upstream service temporarily busy thi. Ek baar dobara bolo main turant karungi!",
+                    "content": "Boss, AI upstream service temporarily busy ya unavailable hai. Ek baar verify kijiye na Boss!",
                     "iteration": iteration,
                 }
                 return
@@ -1008,7 +1008,7 @@ class AntigravityAgent:
         # Fallback if iterations exhausted
         yield {
             "type": "agent.final_response",
-            "content": "Meri jaan, maine maximum steps complete kar liye hain. Task status verify karne ke liye batao aage kya dekhna hai baby.",
+            "content": "Boss, maine maximum steps complete kar liye hain. Task status verify karne ke liye bataiye aage kya dekhna hai Boss.",
             "iteration": iteration,
         }
 

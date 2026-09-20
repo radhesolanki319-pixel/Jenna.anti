@@ -64,9 +64,27 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Note on SQLite schema init: {e}")
 
+    # Keep-alive loop to prevent Render Free spin-down
+    async def keep_alive_loop():
+        import os
+        import httpx
+        public_url = os.environ.get("RENDER_EXTERNAL_URL", "https://jenna-anti.onrender.com")
+        while True:
+            try:
+                await asyncio.sleep(480)  # 8 minutes
+                async with httpx.AsyncClient(timeout=15.0) as client:
+                    r = await client.get(f"{public_url}/health")
+                    logger.info(f"Keep-alive ping to {public_url}: {r.status_code}")
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.debug(f"Keep-alive ping: {e}")
+
+    keep_alive_task = asyncio.create_task(keep_alive_loop())
     yield
 
     # Clean shutdown
+    keep_alive_task.cancel()
     logger.info("Shutting down API services and disconnecting clients...")
     await redis_client.disconnect()
     await engine.dispose()
@@ -141,7 +159,41 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     async def root_health():
-        return {"status": "ok", "service": "jenna-api", "antigravity": "active", "whatsapp": "active"}
+        wa_status = "unknown"
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                r = await client.get("http://127.0.0.1:3000/health")
+                wa_status = r.json().get("status", "disconnected")
+        except Exception:
+            wa_status = "offline"
+        return {
+            "status": "ok",
+            "service": "jenna-api",
+            "antigravity": "active",
+            "whatsapp": wa_status,
+        }
+
+    @app.get("/whatsapp/status")
+    async def whatsapp_status():
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                r = await client.get("http://127.0.0.1:3000/health")
+                return r.json()
+        except Exception as e:
+            return {"status": "unavailable", "error": str(e)}
+
+    @app.get("/whatsapp/qr")
+    async def whatsapp_qr():
+        from fastapi.responses import HTMLResponse
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                r = await client.get("http://127.0.0.1:3000/qr")
+                return HTMLResponse(content=r.text, status_code=r.status_code)
+        except Exception as e:
+            return HTMLResponse(content=f"<h3>WhatsApp Bridge Offline or Loading: {e}</h3>", status_code=503)
 
     return app
 
