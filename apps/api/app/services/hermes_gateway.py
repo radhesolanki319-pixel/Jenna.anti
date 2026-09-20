@@ -179,20 +179,22 @@ class HermesMessagingGateway:
         # Enforce user preference: STRICTLY address user as Boss, NEVER use baby / jaan / meri jaan
         response_text = re.sub(r"\b(meri\s+jaan|jaan|baby|babe|sweetheart|darling)\b", "Boss", response_text, flags=re.IGNORECASE)
 
-        now_t = datetime.datetime.now(datetime.timezone.utc)
+        IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
+        now_t = datetime.datetime.now(IST)
+        ist_str = now_t.strftime("%Y-%m-%d %I:%M:%S %p IST")
         history.append({
             "role": "user",
             "content": message,
             "platform": platform,
             "timestamp": now_t.timestamp(),
-            "time_str": now_t.strftime("%Y-%m-%d %H:%M:%S"),
+            "time_str": ist_str,
         })
         history.append({
             "role": "assistant",
             "content": response_text,
             "platform": platform,
             "timestamp": now_t.timestamp(),
-            "time_str": now_t.strftime("%Y-%m-%d %H:%M:%S"),
+            "time_str": ist_str,
         })
 
         # Save to disk immediately

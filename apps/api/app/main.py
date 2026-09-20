@@ -245,10 +245,16 @@ h1 { color: #38bdf8; margin: 0; font-size: 20px; }
         if not convs:
             html += "<p style='text-align:center;color:#64748b;'>No messages recorded in this container yet. Send a message on WhatsApp to start!</p>"
         else:
+            import datetime
+            IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
             for user, msgs in convs.items():
                 for m in msgs:
                     role = m.get("role", "user")
-                    time_str = m.get("time_str", "")
+                    ts = m.get("timestamp")
+                    if ts:
+                        time_str = datetime.datetime.fromtimestamp(ts, tz=IST).strftime("%I:%M:%S %p IST")
+                    else:
+                        time_str = m.get("time_str", "")
                     content = m.get("content", "")
                     sender = "Boss 👑" if role == "user" else "Jenna 🤖"
                     html += f'<div class="msg {role}"><div class="meta">{sender} • {time_str}</div><div>{content}</div></div>'
