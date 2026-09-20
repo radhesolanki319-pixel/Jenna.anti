@@ -868,7 +868,7 @@ class AntigravityAgent:
                 if preferred_model and any(k in preferred_model.lower() for k in ("fable", "astra")):
                     res = await frontier_router.route_and_generate(req, preferred_model=preferred_model)
                 else:
-                    for mod in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-lite-latest"]:
+                    for mod in ["gemini-3.6-flash", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-3.8-flash"]:
                         try:
                             req.model = mod
                             async with asyncio.timeout(15.0):
