@@ -32,6 +32,7 @@ from app.routers import (
     vision,
     voice,
     websocket,
+    device_bridge,
 )
 
 
@@ -159,6 +160,7 @@ def create_app() -> FastAPI:
     app.include_router(vision.router, prefix="/api/v1")
     app.include_router(voice.router, prefix="/api/v1")
     app.include_router(websocket.router, prefix="/api/v1")
+    app.include_router(device_bridge.router)
 
 
 

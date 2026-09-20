@@ -20,6 +20,7 @@ from app.routers import (
     vision,
     voice,
     websocket,
+    device_bridge,
 )
 
 __all__ = [
@@ -44,6 +45,7 @@ __all__ = [
     "vision",
     "voice",
     "websocket",
+    "device_bridge",
 ]
 
 
