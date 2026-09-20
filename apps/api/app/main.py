@@ -196,6 +196,65 @@ def create_app() -> FastAPI:
         except Exception as e:
             return HTMLResponse(content=f"<h3>WhatsApp Bridge Offline or Loading: {e}</h3>", status_code=503)
 
+    @app.get("/whatsapp/chats")
+    async def whatsapp_live_chats(limit: int = 50):
+        """Retrieve live WhatsApp chat history stored in Cloud container."""
+        import json
+        import os
+        from pathlib import Path
+        conv_dir = Path(os.getenv("JENNA_WORKSPACE_ROOT", "/app")) / "data" / "conversations"
+        results = {}
+        if conv_dir.exists():
+            for f in conv_dir.glob("*.jsonl"):
+                try:
+                    lines = [json.loads(line) for line in f.read_text(encoding="utf-8").strip().split("\n") if line.strip()]
+                    results[f.stem] = lines[-limit:]
+                except Exception:
+                    pass
+            for f in conv_dir.glob("*.json"):
+                if f.stem not in results:
+                    try:
+                        data = json.loads(f.read_text(encoding="utf-8"))
+                        if isinstance(data, list):
+                            results[f.stem] = data[-limit:]
+                    except Exception:
+                        pass
+        return {"total_threads": len(results), "conversations": results}
+
+    @app.get("/whatsapp/live")
+    async def whatsapp_live_viewer():
+        """Web UI to view live WhatsApp chat messages."""
+        from fastapi.responses import HTMLResponse
+        data = await whatsapp_live_chats(limit=100)
+        convs = data.get("conversations", {})
+        html = """<!DOCTYPE html><html><head><meta charset="utf-8"><title>Jenna Live WhatsApp Chats</title>
+<meta http-equiv="refresh" content="10">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
+.header { max-width: 800px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+h1 { color: #38bdf8; margin: 0; font-size: 20px; }
+.badge { background: #10b981; color: #0f172a; padding: 4px 10px; border-radius: 12px; font-weight: 700; font-size: 12px; }
+.chat-box { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.msg { padding: 12px 16px; border-radius: 12px; max-width: 75%; font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.msg.user { align-self: flex-end; background: #0284c7; color: #fff; }
+.msg.assistant { align-self: flex-start; background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
+.meta { font-size: 11px; opacity: 0.7; margin-bottom: 4px; }
+</style></head><body>
+<div class="header"><h1>💬 Jenna Live WhatsApp Monitor</h1><span class="badge">LIVE (Auto-refresh 10s)</span></div>
+<div class="chat-box">"""
+        if not convs:
+            html += "<p style='text-align:center;color:#64748b;'>No messages recorded in this container yet. Send a message on WhatsApp to start!</p>"
+        else:
+            for user, msgs in convs.items():
+                for m in msgs:
+                    role = m.get("role", "user")
+                    time_str = m.get("time_str", "")
+                    content = m.get("content", "")
+                    sender = "Boss 👑" if role == "user" else "Jenna 🤖"
+                    html += f'<div class="msg {role}"><div class="meta">{sender} • {time_str}</div><div>{content}</div></div>'
+        html += "</div></body></html>"
+        return HTMLResponse(content=html)
+
     return app
 
 
