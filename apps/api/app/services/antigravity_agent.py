@@ -107,7 +107,7 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 45. phone_list_files: Browse files and folders directly inside Boss's phone storage (/storage/emulated/0/...) (e.g. {{"path": "/storage/emulated/0/Download"}})
 46. phone_read_file: Read a file directly from Boss's phone storage (e.g. {{"path": "/storage/emulated/0/Download/notes.txt"}})
 47. phone_organize_storage: Safely organize and sort messy files in Boss's phone storage into neat folders (Documents, Images, Audio, Archives) (e.g. {{"folder": "/storage/emulated/0/Download"}})
-48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})
+48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})\n49. phone_tap: Tap at exact screen coordinates on Boss's phone (e.g. {{"x": 630, "y": 1400}})\n50. phone_swipe: Swipe gesture on Boss's phone screen (e.g. {{"x1": 630, "y1": 2100, "x2": 630, "y2": 700, "duration_ms": 300}})\n51. phone_type: Type text on the currently focused input field on Boss's phone (e.g. {{"text": "Hello Rahul!"}})\n52. phone_key: Send a key event on Boss's phone (e.g. {{"keycode": "HOME"}} or {{"keycode": "BACK"}} or {{"keycode": "ENTER"}})\n53. phone_screenshot: Capture a live screenshot from Boss's phone screen (e.g. {{}}) — returns base64 PNG\n54. phone_open_app: Open any app on Boss's phone by package name (e.g. {{"package": "com.whatsapp"}} or {{"package": "com.instagram.android"}})\n55. phone_close_app: Force stop any app on Boss's phone (e.g. {{"package": "com.whatsapp"}})\n56. phone_sms_send: Send an SMS directly from Boss's phone (e.g. {{"number": "+919876543210", "message": "On my way!"}})\n57. phone_sms_inbox: Read SMS inbox from Boss's phone (e.g. {{"limit": 10}})\n58. phone_call: Make a phone call from Boss's phone (e.g. {{"number": "+919876543210"}})\n59. phone_camera: Take a photo using Boss's phone camera (e.g. {{"camera_id": 0}}) — 0=back, 1=front\n60. phone_location: Get Boss's current GPS location (e.g. {{}})\n61. phone_notification: Send a notification on Boss's phone (e.g. {{"title": "Reminder", "content": "Meeting in 5 mins"}})\n62. phone_notifications_list: Read all active notifications on Boss's phone (e.g. {{}})\n63. phone_clipboard_get: Get current clipboard content from Boss's phone (e.g. {{}})\n64. phone_clipboard_set: Set clipboard content on Boss's phone (e.g. {{"text": "some text to copy"}})\n65. phone_contacts: Get all contacts from Boss's phone (e.g. {{}})\n66. phone_wifi: Toggle WiFi on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n67. phone_bluetooth: Toggle Bluetooth on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n68. phone_volume: Set volume on Boss's phone (e.g. {{"stream": 3, "level": 10}}) — stream: 3=music, 2=ring, 5=notif\n69. phone_brightness: Set screen brightness on Boss's phone 0-255 (e.g. {{"level": 200}})\n70. phone_torch: Toggle flashlight on Boss's phone (e.g. {{"enable": true}})\n71. phone_vibrate: Vibrate Boss's phone (e.g. {{"duration_ms": 500}})\n72. phone_speak: Speak text aloud on Boss's phone using TTS (e.g. {{"text": "Hello Boss!", "language": "hi"}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -873,6 +873,184 @@ class AntigravityAgent:
                 from app.services.phone_bridge_hub import phone_bridge_hub
                 res = await phone_bridge_hub.execute_on_phone("device_vitals", {})
                 return {"tool": "phone_vitals", **res}
+
+            # ── GOD MODE TOOLS (49-72) ──────────────────────────────────────
+
+            # 49. phone_tap
+            elif tool_name == "phone_tap":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("screen.tap", {"x": int(args.get("x", 630)), "y": int(args.get("y", 1400))})
+                return {"tool": "phone_tap", **res}
+
+            # 50. phone_swipe
+            elif tool_name == "phone_swipe":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("screen.swipe", {
+                    "x1": int(args.get("x1", 630)), "y1": int(args.get("y1", 2100)),
+                    "x2": int(args.get("x2", 630)), "y2": int(args.get("y2", 700)),
+                    "duration_ms": int(args.get("duration_ms", 300)),
+                })
+                return {"tool": "phone_swipe", **res}
+
+            # 51. phone_type
+            elif tool_name == "phone_type":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("screen.type", {"text": args.get("text", "")})
+                return {"tool": "phone_type", **res}
+
+            # 52. phone_key
+            elif tool_name == "phone_key":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("screen.key", {"keycode": args.get("keycode", "HOME")})
+                return {"tool": "phone_key", **res}
+
+            # 53. phone_screenshot
+            elif tool_name == "phone_screenshot":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("screen.screenshot", {"base64": args.get("base64", True)}, timeout=15.0)
+                return {"tool": "phone_screenshot", **res}
+
+            # 54. phone_open_app
+            elif tool_name == "phone_open_app":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("app.open", {
+                    "package": args.get("package", ""),
+                    "activity": args.get("activity"),
+                })
+                return {"tool": "phone_open_app", **res}
+
+            # 55. phone_close_app
+            elif tool_name == "phone_close_app":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("app.close", {"package": args.get("package", "")})
+                return {"tool": "phone_close_app", **res}
+
+            # 56. phone_sms_send
+            elif tool_name == "phone_sms_send":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("sms.send", {
+                    "number": args.get("number", ""),
+                    "message": args.get("message", ""),
+                }, timeout=15.0)
+                return {"tool": "phone_sms_send", **res}
+
+            # 57. phone_sms_inbox
+            elif tool_name == "phone_sms_inbox":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("sms.inbox", {"limit": int(args.get("limit", 20))}, timeout=15.0)
+                return {"tool": "phone_sms_inbox", **res}
+
+            # 58. phone_call
+            elif tool_name == "phone_call":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("call.dial", {"number": args.get("number", "")}, timeout=10.0)
+                return {"tool": "phone_call", **res}
+
+            # 59. phone_camera
+            elif tool_name == "phone_camera":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("camera.photo", {
+                    "camera_id": int(args.get("camera_id", 0)),
+                    "save_path": args.get("save_path"),
+                }, timeout=15.0)
+                return {"tool": "phone_camera", **res}
+
+            # 60. phone_location
+            elif tool_name == "phone_location":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("location.get", {"provider": args.get("provider", "gps")}, timeout=35.0)
+                return {"tool": "phone_location", **res}
+
+            # 61. phone_notification
+            elif tool_name == "phone_notification":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("notif.send", {
+                    "title": args.get("title", "Jenna"),
+                    "content": args.get("content", args.get("message", "")),
+                    "id": args.get("id"),
+                })
+                return {"tool": "phone_notification", **res}
+
+            # 62. phone_notifications_list
+            elif tool_name == "phone_notifications_list":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("notif.list", {})
+                return {"tool": "phone_notifications_list", **res}
+
+            # 63. phone_clipboard_get
+            elif tool_name == "phone_clipboard_get":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("clipboard.get", {})
+                return {"tool": "phone_clipboard_get", **res}
+
+            # 64. phone_clipboard_set
+            elif tool_name == "phone_clipboard_set":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("clipboard.set", {"text": args.get("text", "")})
+                return {"tool": "phone_clipboard_set", **res}
+
+            # 65. phone_contacts
+            elif tool_name == "phone_contacts":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("contacts.list", {}, timeout=25.0)
+                return {"tool": "phone_contacts", **res}
+
+            # 66. phone_wifi
+            elif tool_name == "phone_wifi":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                enable = args.get("enable", True)
+                action = "wifi.on" if enable else "wifi.off"
+                res = await phone_bridge_hub.execute_on_phone(action, {})
+                return {"tool": "phone_wifi", "enabled": enable, **res}
+
+            # 67. phone_bluetooth
+            elif tool_name == "phone_bluetooth":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                enable = args.get("enable", True)
+                action = "bluetooth.on" if enable else "bluetooth.off"
+                res = await phone_bridge_hub.execute_on_phone(action, {})
+                return {"tool": "phone_bluetooth", "enabled": enable, **res}
+
+            # 68. phone_volume
+            elif tool_name == "phone_volume":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("volume.set", {
+                    "stream": int(args.get("stream", 3)),
+                    "level": int(args.get("level", 7)),
+                })
+                return {"tool": "phone_volume", **res}
+
+            # 69. phone_brightness
+            elif tool_name == "phone_brightness":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("brightness.set", {"level": int(args.get("level", 128))})
+                return {"tool": "phone_brightness", **res}
+
+            # 70. phone_torch
+            elif tool_name == "phone_torch":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                enable = args.get("enable", True)
+                action = "torch.on" if enable else "torch.off"
+                res = await phone_bridge_hub.execute_on_phone(action, {})
+                return {"tool": "phone_torch", "enabled": enable, **res}
+
+            # 71. phone_vibrate
+            elif tool_name == "phone_vibrate":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("vibrate", {"duration_ms": int(args.get("duration_ms", 500))})
+                return {"tool": "phone_vibrate", **res}
+
+            # 72. phone_speak
+            elif tool_name == "phone_speak":
+                from app.services.phone_bridge_hub import phone_bridge_hub
+                res = await phone_bridge_hub.execute_on_phone("tts.speak", {
+                    "text": args.get("text", ""),
+                    "language": args.get("language", "en"),
+                    "rate": float(args.get("rate", 1.0)),
+                }, timeout=35.0)
+                return {"tool": "phone_speak", **res}
+
+
 
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}
