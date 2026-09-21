@@ -234,3 +234,15 @@ async def list_god_mode_actions():
         "actions": actions,
         "god_mode": True,
     }
+
+
+@router.post("/speak")
+async def jenna_speak(payload: Dict[str, Any]):
+    """Make Jenna speak text aloud on Boss's phone via TTS."""
+    text = payload.get("text", "")
+    language = payload.get("language", "en")
+    return await phone_bridge_hub.execute_on_phone(
+        "tts.speak",
+        {"text": text, "language": language},
+        timeout=30.0,
+    )

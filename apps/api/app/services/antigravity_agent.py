@@ -107,7 +107,7 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 45. phone_list_files: Browse files and folders directly inside Boss's phone storage (/storage/emulated/0/...) (e.g. {{"path": "/storage/emulated/0/Download"}})
 46. phone_read_file: Read a file directly from Boss's phone storage (e.g. {{"path": "/storage/emulated/0/Download/notes.txt"}})
 47. phone_organize_storage: Safely organize and sort messy files in Boss's phone storage into neat folders (Documents, Images, Audio, Archives) (e.g. {{"folder": "/storage/emulated/0/Download"}})
-48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})\n49. phone_tap: Tap at exact screen coordinates on Boss's phone (e.g. {{"x": 630, "y": 1400}})\n50. phone_swipe: Swipe gesture on Boss's phone screen (e.g. {{"x1": 630, "y1": 2100, "x2": 630, "y2": 700, "duration_ms": 300}})\n51. phone_type: Type text on the currently focused input field on Boss's phone (e.g. {{"text": "Hello Rahul!"}})\n52. phone_key: Send a key event on Boss's phone (e.g. {{"keycode": "HOME"}} or {{"keycode": "BACK"}} or {{"keycode": "ENTER"}})\n53. phone_screenshot: Capture a live screenshot from Boss's phone screen (e.g. {{}}) — returns base64 PNG\n54. phone_open_app: Open any app on Boss's phone by package name (e.g. {{"package": "com.whatsapp"}} or {{"package": "com.instagram.android"}})\n55. phone_close_app: Force stop any app on Boss's phone (e.g. {{"package": "com.whatsapp"}})\n56. phone_sms_send: Send an SMS directly from Boss's phone (e.g. {{"number": "+919876543210", "message": "On my way!"}})\n57. phone_sms_inbox: Read SMS inbox from Boss's phone (e.g. {{"limit": 10}})\n58. phone_call: Make a phone call from Boss's phone (e.g. {{"number": "+919876543210"}})\n59. phone_camera: Take a photo using Boss's phone camera (e.g. {{"camera_id": 0}}) — 0=back, 1=front\n60. phone_location: Get Boss's current GPS location (e.g. {{}})\n61. phone_notification: Send a notification on Boss's phone (e.g. {{"title": "Reminder", "content": "Meeting in 5 mins"}})\n62. phone_notifications_list: Read all active notifications on Boss's phone (e.g. {{}})\n63. phone_clipboard_get: Get current clipboard content from Boss's phone (e.g. {{}})\n64. phone_clipboard_set: Set clipboard content on Boss's phone (e.g. {{"text": "some text to copy"}})\n65. phone_contacts: Get all contacts from Boss's phone (e.g. {{}})\n66. phone_wifi: Toggle WiFi on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n67. phone_bluetooth: Toggle Bluetooth on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n68. phone_volume: Set volume on Boss's phone (e.g. {{"stream": 3, "level": 10}}) — stream: 3=music, 2=ring, 5=notif\n69. phone_brightness: Set screen brightness on Boss's phone 0-255 (e.g. {{"level": 200}})\n70. phone_torch: Toggle flashlight on Boss's phone (e.g. {{"enable": true}})\n71. phone_vibrate: Vibrate Boss's phone (e.g. {{"duration_ms": 500}})\n72. phone_speak: Speak text aloud on Boss's phone using TTS (e.g. {{"text": "Hello Boss!", "language": "hi"}})
+48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})\n49. phone_tap: Tap at exact screen coordinates on Boss's phone (e.g. {{"x": 630, "y": 1400}})\n50. phone_swipe: Swipe gesture on Boss's phone screen (e.g. {{"x1": 630, "y1": 2100, "x2": 630, "y2": 700, "duration_ms": 300}})\n51. phone_type: Type text on the currently focused input field on Boss's phone (e.g. {{"text": "Hello Rahul!"}})\n52. phone_key: Send a key event on Boss's phone (e.g. {{"keycode": "HOME"}} or {{"keycode": "BACK"}} or {{"keycode": "ENTER"}})\n53. phone_screenshot: Capture a live screenshot from Boss's phone screen (e.g. {{}}) — returns base64 PNG\n54. phone_open_app: Open any app on Boss's phone by package name (e.g. {{"package": "com.whatsapp"}} or {{"package": "com.instagram.android"}})\n55. phone_close_app: Force stop any app on Boss's phone (e.g. {{"package": "com.whatsapp"}})\n56. phone_sms_send: Send an SMS directly from Boss's phone (e.g. {{"number": "+919876543210", "message": "On my way!"}})\n57. phone_sms_inbox: Read SMS inbox from Boss's phone (e.g. {{"limit": 10}})\n58. phone_call: Make a phone call from Boss's phone (e.g. {{"number": "+919876543210"}})\n59. phone_camera: Take a photo using Boss's phone camera (e.g. {{"camera_id": 0}}) — 0=back, 1=front\n60. phone_location: Get Boss's current GPS location (e.g. {{}})\n61. phone_notification: Send a notification on Boss's phone (e.g. {{"title": "Reminder", "content": "Meeting in 5 mins"}})\n62. phone_notifications_list: Read all active notifications on Boss's phone (e.g. {{}})\n63. phone_clipboard_get: Get current clipboard content from Boss's phone (e.g. {{}})\n64. phone_clipboard_set: Set clipboard content on Boss's phone (e.g. {{"text": "some text to copy"}})\n65. phone_contacts: Get all contacts from Boss's phone (e.g. {{}})\n66. phone_wifi: Toggle WiFi on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n67. phone_bluetooth: Toggle Bluetooth on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n68. phone_volume: Set volume on Boss's phone (e.g. {{"stream": 3, "level": 10}}) — stream: 3=music, 2=ring, 5=notif\n69. phone_brightness: Set screen brightness on Boss's phone 0-255 (e.g. {{"level": 200}})\n70. phone_torch: Toggle flashlight on Boss's phone (e.g. {{"enable": true}})\n71. phone_vibrate: Vibrate Boss's phone (e.g. {{"duration_ms": 500}})\n72. phone_speak: Speak text aloud on Boss's phone using TTS (e.g. {{"text": "Hello Boss!", "language": "hi"}})\n73. web_search: Search the internet for any information (e.g. {{"query": "latest iQOO Neo 10 update"}})\n74. get_weather: Get current weather for any city (e.g. {{"city": "Mumbai"}})\n75. get_news: Get latest news on any topic (e.g. {{"topic": "India technology"}})\n76. get_time: Get current IST date and time (e.g. {{}})\n77. check_internet: Check if internet is working and get IP info (e.g. {{}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -1050,7 +1050,72 @@ class AntigravityAgent:
                 }, timeout=35.0)
                 return {"tool": "phone_speak", **res}
 
+            # 73. web_search
+            elif tool_name == "web_search":
+                import aiohttp, urllib.parse
+                query = args.get("query", "")
+                url = f"https://api.duckduckgo.com/?q={urllib.parse.quote(query)}&format=json&no_html=1&skip_disambig=1"
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=8)) as resp:
+                            data = await resp.json(content_type=None)
+                    abstract = data.get("AbstractText", "")
+                    related = [{"t": r.get("Text", "")[:100], "u": r.get("FirstURL", "")} for r in data.get("RelatedTopics", [])[:5] if r.get("Text")]
+                    return {"tool": "web_search", "query": query, "abstract": abstract, "related": related, "success": bool(abstract or related)}
+                except Exception as e:
+                    return {"tool": "web_search", "error": str(e), "success": False}
 
+            # 74. get_weather
+            elif tool_name == "get_weather":
+                import aiohttp
+                city = args.get("city", "auto")
+                url = f"https://wttr.in/{city}?format=j1"
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=8), headers={"User-Agent": "curl/7.0"}) as resp:
+                            data = await resp.json(content_type=None)
+                    curr = data.get("current_condition", [{}])[0]
+                    area = data.get("nearest_area", [{}])[0]
+                    return {"tool": "get_weather", "city": city, "temp_c": curr.get("temp_C"), "feels_like": curr.get("FeelsLikeC"), "desc": curr.get("weatherDesc", [{}])[0].get("value", ""), "humidity": curr.get("humidity"), "area": area.get("areaName", [{}])[0].get("value", ""), "success": True}
+                except Exception as e:
+                    return {"tool": "get_weather", "error": str(e), "success": False}
+
+            # 75. get_news
+            elif tool_name == "get_news":
+                import aiohttp, urllib.parse
+                topic = args.get("topic", "India")
+                ddg_url = f"https://api.duckduckgo.com/?q={urllib.parse.quote(topic + ' news')}&format=json&no_html=1"
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(ddg_url, timeout=aiohttp.ClientTimeout(total=8)) as resp:
+                            data = await resp.json(content_type=None)
+                    related = [{"title": r.get("Text", "")[:150], "url": r.get("FirstURL", "")} for r in data.get("RelatedTopics", [])[:5] if r.get("Text")]
+                    return {"tool": "get_news", "topic": topic, "articles": related, "success": bool(related)}
+                except Exception as e:
+                    return {"tool": "get_news", "error": str(e), "success": False}
+
+            # 76. get_time
+            elif tool_name == "get_time":
+                import datetime, pytz
+                try:
+                    ist = pytz.timezone("Asia/Kolkata")
+                    now = datetime.datetime.now(ist)
+                    return {"tool": "get_time", "datetime": now.strftime("%Y-%m-%d %H:%M:%S"), "date": now.strftime("%d %B %Y"), "time": now.strftime("%I:%M %p"), "day": now.strftime("%A"), "timezone": "IST (UTC+5:30)", "success": True}
+                except Exception as e:
+                    import datetime as dt
+                    now = dt.datetime.utcnow()
+                    return {"tool": "get_time", "datetime": str(now), "success": True}
+
+            # 77. check_internet
+            elif tool_name == "check_internet":
+                import aiohttp
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get("https://api.ipify.org?format=json", timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                            ip_data = await resp.json()
+                    return {"tool": "check_internet", "connected": True, "public_ip": ip_data.get("ip"), "success": True}
+                except Exception as e:
+                    return {"tool": "check_internet", "connected": False, "error": str(e), "success": False}
 
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}
