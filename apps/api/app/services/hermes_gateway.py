@@ -218,6 +218,13 @@ class HermesMessagingGateway:
         # Update crash-proof session state
         self._update_session_state(user_id, message, response_text)
 
+        # Autonomous memory extraction and learning
+        try:
+            from app.services.permanent_memory import permanent_memory
+            permanent_memory.learn_from_conversation(message, response_text)
+        except Exception as mem_err:
+            logger.debug(f"Failed to extract memory from conversation: {mem_err}")
+
         return response_text
 
 

@@ -107,7 +107,7 @@ You have DIRECT, REAL-TIME execution tools on the user's Termux Linux machine, A
 45. phone_list_files: Browse files and folders directly inside Boss's phone storage (/storage/emulated/0/...) (e.g. {{"path": "/storage/emulated/0/Download"}})
 46. phone_read_file: Read a file directly from Boss's phone storage (e.g. {{"path": "/storage/emulated/0/Download/notes.txt"}})
 47. phone_organize_storage: Safely organize and sort messy files in Boss's phone storage into neat folders (Documents, Images, Audio, Archives) (e.g. {{"folder": "/storage/emulated/0/Download"}})
-48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})\n49. phone_tap: Tap at exact screen coordinates on Boss's phone (e.g. {{"x": 630, "y": 1400}})\n50. phone_swipe: Swipe gesture on Boss's phone screen (e.g. {{"x1": 630, "y1": 2100, "x2": 630, "y2": 700, "duration_ms": 300}})\n51. phone_type: Type text on the currently focused input field on Boss's phone (e.g. {{"text": "Hello Rahul!"}})\n52. phone_key: Send a key event on Boss's phone (e.g. {{"keycode": "HOME"}} or {{"keycode": "BACK"}} or {{"keycode": "ENTER"}})\n53. phone_screenshot: Capture a live screenshot from Boss's phone screen (e.g. {{}}) — returns base64 PNG\n54. phone_open_app: Open any app on Boss's phone by package name (e.g. {{"package": "com.whatsapp"}} or {{"package": "com.instagram.android"}})\n55. phone_close_app: Force stop any app on Boss's phone (e.g. {{"package": "com.whatsapp"}})\n56. phone_sms_send: Send an SMS directly from Boss's phone (e.g. {{"number": "+919876543210", "message": "On my way!"}})\n57. phone_sms_inbox: Read SMS inbox from Boss's phone (e.g. {{"limit": 10}})\n58. phone_call: Make a phone call from Boss's phone (e.g. {{"number": "+919876543210"}})\n59. phone_camera: Take a photo using Boss's phone camera (e.g. {{"camera_id": 0}}) — 0=back, 1=front\n60. phone_location: Get Boss's current GPS location (e.g. {{}})\n61. phone_notification: Send a notification on Boss's phone (e.g. {{"title": "Reminder", "content": "Meeting in 5 mins"}})\n62. phone_notifications_list: Read all active notifications on Boss's phone (e.g. {{}})\n63. phone_clipboard_get: Get current clipboard content from Boss's phone (e.g. {{}})\n64. phone_clipboard_set: Set clipboard content on Boss's phone (e.g. {{"text": "some text to copy"}})\n65. phone_contacts: Get all contacts from Boss's phone (e.g. {{}})\n66. phone_wifi: Toggle WiFi on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n67. phone_bluetooth: Toggle Bluetooth on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n68. phone_volume: Set volume on Boss's phone (e.g. {{"stream": 3, "level": 10}}) — stream: 3=music, 2=ring, 5=notif\n69. phone_brightness: Set screen brightness on Boss's phone 0-255 (e.g. {{"level": 200}})\n70. phone_torch: Toggle flashlight on Boss's phone (e.g. {{"enable": true}})\n71. phone_vibrate: Vibrate Boss's phone (e.g. {{"duration_ms": 500}})\n72. phone_speak: Speak text aloud on Boss's phone using TTS (e.g. {{"text": "Hello Boss!", "language": "hi"}})\n73. web_search: Search the internet for any information (e.g. {{"query": "latest iQOO Neo 10 update"}})\n74. get_weather: Get current weather for any city (e.g. {{"city": "Mumbai"}})\n75. get_news: Get latest news on any topic (e.g. {{"topic": "India technology"}})\n76. get_time: Get current IST date and time (e.g. {{}})\n77. check_internet: Check if internet is working and get IP info (e.g. {{}})
+48. phone_vitals: Get real-time live battery, temperature, storage, and specs directly from Boss's physical phone (e.g. {{}})\n49. phone_tap: Tap at exact screen coordinates on Boss's phone (e.g. {{"x": 630, "y": 1400}})\n50. phone_swipe: Swipe gesture on Boss's phone screen (e.g. {{"x1": 630, "y1": 2100, "x2": 630, "y2": 700, "duration_ms": 300}})\n51. phone_type: Type text on the currently focused input field on Boss's phone (e.g. {{"text": "Hello Rahul!"}})\n52. phone_key: Send a key event on Boss's phone (e.g. {{"keycode": "HOME"}} or {{"keycode": "BACK"}} or {{"keycode": "ENTER"}})\n53. phone_screenshot: Capture a live screenshot from Boss's phone screen (e.g. {{}}) — returns base64 PNG\n54. phone_open_app: Open any app on Boss's phone by package name (e.g. {{"package": "com.whatsapp"}} or {{"package": "com.instagram.android"}})\n55. phone_close_app: Force stop any app on Boss's phone (e.g. {{"package": "com.whatsapp"}})\n56. phone_sms_send: Send an SMS directly from Boss's phone (e.g. {{"number": "+919876543210", "message": "On my way!"}})\n57. phone_sms_inbox: Read SMS inbox from Boss's phone (e.g. {{"limit": 10}})\n58. phone_call: Make a phone call from Boss's phone (e.g. {{"number": "+919876543210"}})\n59. phone_camera: Take a photo using Boss's phone camera (e.g. {{"camera_id": 0}}) — 0=back, 1=front\n60. phone_location: Get Boss's current GPS location (e.g. {{}})\n61. phone_notification: Send a notification on Boss's phone (e.g. {{"title": "Reminder", "content": "Meeting in 5 mins"}})\n62. phone_notifications_list: Read all active notifications on Boss's phone (e.g. {{}})\n63. phone_clipboard_get: Get current clipboard content from Boss's phone (e.g. {{}})\n64. phone_clipboard_set: Set clipboard content on Boss's phone (e.g. {{"text": "some text to copy"}})\n65. phone_contacts: Get all contacts from Boss's phone (e.g. {{}})\n66. phone_wifi: Toggle WiFi on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n67. phone_bluetooth: Toggle Bluetooth on Boss's phone (e.g. {{"enable": true}} or {{"enable": false}})\n68. phone_volume: Set volume on Boss's phone (e.g. {{"stream": 3, "level": 10}}) — stream: 3=music, 2=ring, 5=notif\n69. phone_brightness: Set screen brightness on Boss's phone 0-255 (e.g. {{"level": 200}})\n70. phone_torch: Toggle flashlight on Boss's phone (e.g. {{"enable": true}})\n71. phone_vibrate: Vibrate Boss's phone (e.g. {{"duration_ms": 500}})\n72. phone_speak: Speak text aloud on Boss's phone using TTS (e.g. {{"text": "Hello Boss!", "language": "hi"}})\n73. web_search: Search the internet for any information (e.g. {{"query": "latest iQOO Neo 10 update"}})\n74. get_weather: Get current weather for any city (e.g. {{"city": "Mumbai"}})\n75. get_news: Get latest news on any topic (e.g. {{"topic": "India technology"}})\n76. get_time: Get current IST date and time (e.g. {{}})\n77. check_internet: Check if internet is working and get IP info (e.g. {{}})\n78. memory_remember: Store any fact, habit, project, or preference permanently into Jenna's zero-amnesia memory (e.g. {{"key": "favorite_editor", "value": "Neovim", "category": "preferences"}})\n79. memory_recall: Search Jenna's permanent long-term memory for any past context or knowledge (e.g. {{"query": "iQOO display specs"}})\n80. memory_profile: Retrieve Boss's complete personal profile and stored preferences (e.g. {{}})
 
 HOW TO CALL TOOLS:
 When you need to inspect, test, edit, run, diagnose code, or visually point to anything on screen, emit a tool call block like this:
@@ -1117,6 +1117,29 @@ class AntigravityAgent:
                 except Exception as e:
                     return {"tool": "check_internet", "connected": False, "error": str(e), "success": False}
 
+            # 78. memory_remember
+            elif tool_name in ("memory_remember", "remember"):
+                from app.services.permanent_memory import permanent_memory
+                key = args.get("key", "")
+                val = args.get("value", "")
+                cat = args.get("category", "facts")
+                res = permanent_memory.remember(key, val, category=cat)
+                return {"tool": "memory_remember", **res}
+
+            # 79. memory_recall
+            elif tool_name in ("memory_recall", "recall"):
+                from app.services.permanent_memory import permanent_memory
+                q = args.get("query", "")
+                limit = int(args.get("limit", 10))
+                memories = permanent_memory.recall(q, limit=limit)
+                return {"tool": "memory_recall", "query": q, "count": len(memories), "memories": memories, "success": True}
+
+            # 80. memory_profile
+            elif tool_name in ("memory_profile", "boss_profile"):
+                from app.services.permanent_memory import permanent_memory
+                profile = permanent_memory.get_user_profile()
+                return {"tool": "memory_profile", **profile, "success": True}
+
             else:
                 return {"tool": tool_name, "error": f"Unknown tool: {tool_name}", "success": False}
 
@@ -1192,11 +1215,20 @@ class AntigravityAgent:
 
         honcho_context = hermes_honcho.compile_honcho_directive()
 
+        mem_context = ""
+        try:
+            from app.services.permanent_memory import permanent_memory
+            mem_context = permanent_memory.get_context_for_conversation()
+        except Exception as mem_err:
+            logger.debug(f"Failed to load permanent memory context: {mem_err}")
+
         system_instruction = ANTIGRAVITY_SYSTEM_PROMPT.format(
             workspace_root=str(self.workspace_root),
             live_screen_context=live_screen_context,
             honcho_context=honcho_context,
         )
+        if mem_context:
+            system_instruction += f"\n\n{mem_context}\n"
 
         # Build working messages
         messages: list[ChatMessage] = []

@@ -70,7 +70,11 @@ class Settings(BaseSettings):
         return self
 
     model_config = {
-        "env_file": ".env",
+        "env_file": [
+            "/storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna/apps/api/.env",
+            "/storage/emulated/0/Download/TermuxWorkspace/projects/Antigravity-project/jenna/.env",
+            ".env",
+        ],
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

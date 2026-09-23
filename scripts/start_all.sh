@@ -81,6 +81,33 @@ if ! pgrep -f "touch_adaptive_refresh_daemon.py" >/dev/null 2>&1; then
     echo $! > "$LOGS/touch_refresh.pid"
 fi
 
+
+# Watchdog (keeps everything alive)
+if ! pgrep -f "jenna_watchdog.sh" > /dev/null 2>&1; then
+    setsid bash "$WORKSPACE/scripts/jenna_watchdog.sh" </dev/null >> "$LOGS/watchdog.log" 2>&1 &
+fi
+
+# 10. God Mode Phone Bridge Client (ADB + Termux:API Full Phone Control)
+if ! pgrep -f "phone_bridge_client.py" > /dev/null 2>&1; then
+    sleep 3  # Wait for backend to be ready
+    if curl -s http://127.0.0.1:8000/health > /dev/null 2>&1; then
+        BRIDGE_URL="ws://127.0.0.1:8000/device/bridge"
+    else
+        BRIDGE_URL="wss://jenna-anti.onrender.com/device/bridge"
+    fi
+    JENNA_BRIDGE_WS_URL="$BRIDGE_URL" setsid python3 -u \
+        "$WORKSPACE/scripts/phone_bridge_client.py" \
+        </dev/null > "$LOGS/god_mode_bridge.log" 2>&1 &
+    echo $! > "$LOGS/god_mode_bridge.pid"
+fi
+
+# 11. Proactive Intelligence Daemon v2 (Battery / Temp / Storage / Greetings)
+if ! pgrep -f "jenna_proactive_daemon.py" > /dev/null 2>&1; then
+    setsid python3 -u "$WORKSPACE/scripts/jenna_proactive_daemon.py" \
+        </dev/null >> "$LOGS/proactive_v2.log" 2>&1 &
+    echo $! > "$LOGS/proactive_v2.pid"
+fi
+
 sleep 1
 
 # Native Notification & Haptic Feedback (Disabled for noise suppression)
