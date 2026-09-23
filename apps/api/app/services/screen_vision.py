@@ -62,13 +62,19 @@ async def _capture_screenshot_b64() -> Optional[str]:
 
 async def _call_gemini_vision(screenshot_b64: str, prompt: str) -> Optional[Dict[str, Any]]:
     """Call Gemini Vision API with screenshot and prompt."""
-    if not GOOGLE_API_KEY:
+    try:
+        from app.core.config import settings
+        api_key = settings.effective_google_api_key or os.getenv("GOOGLE_API_KEY", "")
+    except Exception:
+        api_key = os.getenv("GOOGLE_API_KEY", "")
+
+    if not api_key:
         logger.error("GOOGLE_API_KEY not set — cannot use Vision")
         return None
 
     import aiohttp
 
-    url = f"{VISION_API_URL}?key={GOOGLE_API_KEY}"
+    url = f"{VISION_API_URL}?key={api_key}"
     payload = {
         "contents": [{
             "parts": [
