@@ -1131,6 +1131,27 @@ app.get('/chat/:id', async (req, res) => {
   });
 });
 
+// List all participating groups
+app.get('/groups', async (req, res) => {
+  if (!sock) {
+    return res.status(503).json({ success: false, error: 'WhatsApp not connected' });
+  }
+  try {
+    const groups = await sock.groupFetchAllParticipating();
+    const result = Object.values(groups).map(g => ({
+      id: g.id,
+      name: g.subject,
+      creation: g.creation,
+      owner: g.owner,
+      participantsCount: g.participants ? g.participants.length : 0,
+    }));
+    return res.json({ success: true, count: result.length, groups: result });
+  } catch (err) {
+    console.error('[bridge] failed to fetch groups:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({

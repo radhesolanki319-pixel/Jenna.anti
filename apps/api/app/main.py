@@ -230,6 +230,17 @@ def create_app() -> FastAPI:
         except Exception as e:
             return HTMLResponse(content=f"<h3>WhatsApp Bridge Offline or Loading: {e}</h3>", status_code=503)
 
+    @app.get("/whatsapp/groups")
+    async def whatsapp_groups():
+        """Retrieve all WhatsApp groups the bot is participating in."""
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.get("http://127.0.0.1:3000/groups")
+                return r.json()
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     @app.get("/whatsapp/chats")
     async def whatsapp_live_chats(limit: int = 50):
         """Retrieve live WhatsApp chat history stored in Cloud container."""
