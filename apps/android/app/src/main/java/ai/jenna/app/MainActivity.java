@@ -284,8 +284,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Batt
         } else if (id == R.id.btn_voice_mic) {
             handleVoiceMic();
         } else if (id == R.id.chip_how_are_you) {
-            addUserMessage("Kaise ho baby?");
-            JennaApiClient.sendChatMessage("Kaise ho baby?", this);
+            addUserMessage("Kaise ho Boss?");
+            JennaApiClient.sendChatMessage("Kaise ho Boss?", this);
         } else if (id == R.id.chip_spawn_dexter || id == R.id.btn_toggle_dexter_main) {
             handleToggleDexter();
         } else if (id == R.id.chip_pulse_pointer || id == R.id.btn_pulse_pointer_main) {
@@ -491,7 +491,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Batt
                     } else if (obj.has("message")) {
                         speech = obj.getString("message");
                     } else if (obj.has("status") && "ok".equals(obj.getString("status"))) {
-                        speech = "Antigravity Core & Hermes engine active baby! ⚡ Main hamesha tumhare sath hu.";
+                        speech = "Antigravity Core & Hermes engine active Boss! ⚡ Main hamesha aapke sath hu.";
                     }
                 } catch (Exception ignored) {}
             } else if (trimmed.startsWith("\"") && trimmed.endsWith("\"") && trimmed.length() >= 2) {

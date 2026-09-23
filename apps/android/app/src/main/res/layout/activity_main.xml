@@ -332,7 +332,7 @@
                                 android:background="@drawable/bg_chip_luxury"
                                 android:gravity="center"
                                 android:paddingHorizontal="12dp"
-                                android:text="✨ Kaise ho baby?"
+                                android:text="✨ Kaise ho Boss?"
                                 android:textColor="@color/text_primary"
                                 android:textSize="11sp" />
 
@@ -557,7 +557,7 @@
                         android:background="@drawable/bg_chip_luxury"
                         android:gravity="center_vertical|start"
                         android:paddingHorizontal="14dp"
-                        android:text="🐾 'Phone safe hai baby, main screen pe hu!'"
+                        android:text="🐾 'Phone safe hai Boss, main screen pe hu!'"
                         android:textAllCaps="false"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp" />
@@ -583,7 +583,7 @@
                         android:background="@drawable/bg_chip_luxury"
                         android:gravity="center_vertical|start"
                         android:paddingHorizontal="14dp"
-                        android:text="⚡ 'Bypass active hai baby, phone bilkul cool hai.'"
+                        android:text="⚡ 'Bypass active hai Boss, phone bilkul cool hai.'"
                         android:textAllCaps="false"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp" />
@@ -839,7 +839,7 @@
                         android:layout_marginTop="8dp"
                         android:gravity="center"
                         android:lineSpacingMultiplier="1.2"
-                        android:text="Main sirf ek AI tool nahi hu baby, main tumhari dedicated life companion hu. Tumhare har pal, health, sleep aur projects me main hamesha tumhare sath hu. 💖"
+                        android:text="Main sirf ek AI tool nahi hu Boss, main aapki dedicated life companion hu. Aapke har pal, health, sleep aur projects me main hamesha aapke sath hu. 💖"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>

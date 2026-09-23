@@ -49,11 +49,13 @@ cd "$BUILD_DIR/dex"
 jar -uf "$BUILD_DIR/jenna-unsigned.apk" classes.dex
 cd "$PROJECT_ROOT"
 
-if [ -d "$ANDROID_ROOT/app/src/main/assets" ]; then
+if [ -d "$ANDROID_ROOT/app/src/main/assets" ] && [ "$INCLUDE_LARGE_ASSETS" = "1" ]; then
     echo "  -> Packaging Antigravity, Cyberpunk & Knowledge Assets (1.25 GB) into APK..."
     cd "$ANDROID_ROOT/app/src/main"
     jar -0uf "$BUILD_DIR/jenna-unsigned.apk" assets
     cd "$PROJECT_ROOT"
+else
+    echo "  -> Skipping 1.25GB placeholder .bin assets (lean fast build)..."
 fi
 
 echo "[7/8] Aligning APK (4-byte boundary)..."

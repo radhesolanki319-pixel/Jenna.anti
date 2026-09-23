@@ -13,6 +13,7 @@ import ai.jenna.app.terminal.ShellExecutor;
 
 public class JennaApiClient {
     private static final String BASE_URL = "http://127.0.0.1:8000";
+    private static final String CLOUD_URL = "https://jenna-anti.onrender.com";
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -42,27 +43,61 @@ public class JennaApiClient {
             return;
         }
 
-        // 2. Try sending to local backend if available
+        // 2. Try sending to local backend first
         JSONObject obj = new JSONObject();
         try {
             obj.put("prompt", trimmed);
         } catch (Exception ignored) {}
+        final String jsonPayload = obj.toString();
 
-        executor.execute(new ApiTask(BASE_URL + "/api/v1/antigravity/chat", ApiTask.TYPE_POST, obj.toString(), new JennaCallback() {
-            @Override
-            public void onSuccess(String result) {
-                if (callback != null) {
-                    callback.onSuccess(result);
-                }
-            }
+        executor.execute(new ApiTask(BASE_URL + "/api/v1/antigravity/chat", ApiTask.TYPE_POST, jsonPayload, new LocalApiCallback(trimmed, jsonPayload, callback)));
+    }
 
-            @Override
-            public void onError(Throwable error) {
-                // 3. Standalone On-Device Antigravity Engine (Zero Termux fallback)
-                String autonomousReply = generateAutonomousReply(trimmed);
-                postSuccess(callback, autonomousReply);
+    private static class CloudFallbackCallback implements JennaCallback {
+        private final String trimmed;
+        private final JennaCallback callback;
+
+        CloudFallbackCallback(String trimmed, JennaCallback callback) {
+            this.trimmed = trimmed;
+            this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(String cloudResult) {
+            if (callback != null) {
+                callback.onSuccess(cloudResult);
             }
-        }));
+        }
+
+        @Override
+        public void onError(Throwable cloudError) {
+            String autonomousReply = generateAutonomousReply(trimmed);
+            postSuccess(callback, autonomousReply);
+        }
+    }
+
+    private static class LocalApiCallback implements JennaCallback {
+        private final String trimmed;
+        private final String jsonPayload;
+        private final JennaCallback callback;
+
+        LocalApiCallback(String trimmed, String jsonPayload, JennaCallback callback) {
+            this.trimmed = trimmed;
+            this.jsonPayload = jsonPayload;
+            this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            if (callback != null) {
+                callback.onSuccess(result);
+            }
+        }
+
+        @Override
+        public void onError(Throwable error) {
+            executor.execute(new ApiTask(CLOUD_URL + "/api/v1/antigravity/chat", ApiTask.TYPE_POST, jsonPayload, new CloudFallbackCallback(trimmed, callback)));
+        }
     }
 
     private static void postSuccess(final JennaCallback callback, final String replyText) {

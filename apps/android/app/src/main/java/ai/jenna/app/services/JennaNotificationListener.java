@@ -112,7 +112,7 @@ public class JennaNotificationListener extends NotificationListenerService {
 
         @Override
         public void onError(Throwable error) {
-            String fallback = "Ji baby, maine message dekh liya! Goku phone se Antigravity companion active hai. Abhi check karti hu! 💖";
+            String fallback = "Ji Boss, maine message dekh liya! Goku phone se Antigravity companion active hai. Abhi check karti hu! 💖";
             service.sendDirectReply(action, fallback);
             JennaDbHelper.getInstance(service).saveMessage("jenna", fallback, "whatsapp");
         }

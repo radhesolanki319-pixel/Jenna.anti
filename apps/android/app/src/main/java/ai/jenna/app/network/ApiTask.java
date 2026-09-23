@@ -32,8 +32,8 @@ public class ApiTask implements Runnable {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(3000);
+            conn.setConnectTimeout(8000);
+            conn.setReadTimeout(45000);
 
             if (requestType == TYPE_POST) {
                 conn.setRequestMethod("POST");
