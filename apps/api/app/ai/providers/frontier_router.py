@@ -208,6 +208,8 @@ class FrontierRouter:
     """Intelligently routes prompts to the ideal Frontier Engine."""
 
     def __init__(self) -> None:
+        from app.ai.providers.freellmapi_provider import FreeLLMAPIFusionProvider
+        self.freellmapi = FreeLLMAPIFusionProvider()
         self.gemini = GeminiProvider()
         self.fable = AnthropicFableProvider()
         self.astra = GPT6AstraProvider()
@@ -224,8 +226,8 @@ class FrontierRouter:
         if any(k in lower for k in ("blender", "bpy", "cad", "exploit", "cybersecurity", "gui click", "computer use", "astra")):
             return "gpt-6-astra"
 
-        # 3. Default: Primary Google Antigravity / Gemini 3.x
-        return "google-antigravity"
+        # 3. Default: Multi-AI Fusion across all 242 models
+        return "fusion"
 
     async def route_and_generate(
         self,
@@ -237,6 +239,16 @@ class FrontierRouter:
         chosen = preferred_model or request.model or self.select_best_model(prompt_text)
         logger.info(f"Frontier Router selected engine: '{chosen}'")
 
+        # 1. Primary: FreeLLMAPI 242+ Model Fusion Pool
+        if self.freellmapi.is_available:
+            try:
+                logger.info("Executing via FreeLLMAPI 242-model Multi-AI Fusion...")
+                async with asyncio.timeout(35.0):
+                    return await self.freellmapi.generate(request)
+            except Exception as e_fl:
+                logger.warning(f"FreeLLMAPI fusion fallback ({e_fl}), routing to cloud providers.")
+
+        # 2. Cloud Fallbacks
         if "fable" in chosen.lower():
             return await self.fable.generate(request)
         elif "astra" in chosen.lower():

@@ -1291,24 +1291,22 @@ class AntigravityAgent:
                 task_type=TaskType.CODING,
             )
 
-            # Generate via frontier router or provider with fallback
+            # Generate via frontier router with FreeLLMAPI 242-model fusion pool & fallbacks
             res = None
             try:
-                if preferred_model and any(k in preferred_model.lower() for k in ("fable", "astra")):
-                    res = await frontier_router.route_and_generate(req, preferred_model=preferred_model)
-                else:
-                    for mod in ["gemini-flash-lite-latest", "gemini-3.6-flash", "gemini-3.8-flash"]:
-                        try:
-                            req.model = mod
-                            async with asyncio.timeout(45.0):
-                                res = await gemini_provider.generate(req)
-                            if res and res.text:
-                                break
-                        except Exception as exc:
-                            logger.warning(f"Model {mod} fallback in agent loop: {exc}")
-                            await asyncio.sleep(0.1)
+                res = await frontier_router.route_and_generate(req, preferred_model=preferred_model)
             except Exception as e_gen:
                 logger.error(f"Frontier generation error in agent loop: {e_gen}", exc_info=True)
+                for mod in ["gemini-flash-lite-latest", "gemini-3.6-flash", "gemini-3.8-flash"]:
+                    try:
+                        req.model = mod
+                        async with asyncio.timeout(45.0):
+                            res = await gemini_provider.generate(req)
+                        if res and res.text:
+                            break
+                    except Exception as exc:
+                        logger.warning(f"Model {mod} fallback in agent loop: {exc}")
+                        await asyncio.sleep(0.1)
 
             if not res or not res.text:
                 yield {
