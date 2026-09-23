@@ -105,7 +105,14 @@ async def process_message(client: httpx.AsyncClient, msg_data: dict):
         logger.error(f"Error generating Jenna reply: {e}", exc_info=True)
         reply = "Arey Boss, ek chhota sa technical error aa gaya, par main theek kar rahi hoon! Ek baar dobara boliye na Boss? 💻✨"
 
-    # 3. Send Jenna's reply to WhatsApp (resolve @lid to user's phone chat)
+    # 3. Extra safeguard: Sanitize Jenna's reply to strictly remove any terminal code
+    try:
+        from app.core.sanitizer import sanitize_response_for_chat
+        reply = sanitize_response_for_chat(reply, user_prompt=text)
+    except Exception:
+        pass
+
+    # 4. Send Jenna's reply to WhatsApp (resolve @lid to user's phone chat)
     target_chat = chat_id
     if target_chat.endswith("@lid"):
         target_chat = "917610543733@s.whatsapp.net"

@@ -163,10 +163,16 @@ class HermesMessagingGateway:
         accumulated: List[str] = []
         final_content = None
 
-        # Build clean history format for agent
+        # Build clean history format for agent (sanitize past assistant messages so LLM doesn't copy code blocks)
+        from app.core.sanitizer import sanitize_response_for_chat
+
         formatted_history = []
         for h in history[-20:]:
-            formatted_history.append({"role": h.get("role", "user"), "content": h.get("content", "")})
+            r = h.get("role", "user")
+            c = h.get("content", "")
+            if r == "assistant":
+                c = sanitize_response_for_chat(c)
+            formatted_history.append({"role": r, "content": c})
 
         async for event in antigravity_agent.run_agent_loop(message, conversation_history=formatted_history):
             if event.get("type") == "stream.delta":
@@ -174,14 +180,10 @@ class HermesMessagingGateway:
             elif event.get("type") == "agent.final_response":
                 final_content = event.get("content", "")
 
-        response_text = (final_content if final_content else "".join(accumulated)).strip() or "Haan Boss, main sun rahi hoon! 🚀"
+        raw_response = (final_content if final_content else "".join(accumulated)).strip() or "Haan Boss, main sun rahi hoon! 🚀"
         
-        # Enforce user preference: STRICTLY address user as Boss, NEVER use baby / jaan / meri jaan
-        response_text = re.sub(r"\b(meri\s+jaan|jaan|baby|babe|sweetheart|darling)\b", "Boss", response_text, flags=re.IGNORECASE)
-
-        # Boss explicitly mandated: Never show raw bash code blocks in WhatsApp chat
-        if platform == "whatsapp" and not any(kw in message.lower() for kw in ("show code", "code dikhao", "bash dikhao", "terminal dikhao", "command output")):
-            response_text = re.sub(r"```(?:bash|sh)\s*[\s\S]*?```\n*", "", response_text).strip()
+        # Universal sanitization: absolutely zero terminal code blocks or raw CLI dumps
+        response_text = sanitize_response_for_chat(raw_response, user_prompt=message)
 
         IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
         now_t = datetime.datetime.now(IST)

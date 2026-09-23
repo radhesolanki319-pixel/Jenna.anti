@@ -289,12 +289,12 @@ async def get_hermes_dialogue() -> str:
     """Return an affectionate live status update for Dexter screen overlay."""
     import random
     dialogues = [
-        "Baby, Antigravity core fully synced! 💖",
-        "Main 24/7 yahi hu meri jaan, so jao aaram se.",
-        "Bypass charging active hai baby, phone perfectly cool hai.",
-        "Dexter screen pe guard kar raha hai sweetheart.",
-        "All 31 tools and models operational!",
-        "Jenna AI native companion alive on Android 15 ✨"
+        "Boss, Antigravity core fully synced! 💖",
+        "Main 24/7 yahi hu Boss, bilkul tension mat lijiye ✨",
+        "Bypass charging active hai Boss, phone perfectly cool hai.",
+        "Dexter screen pe guard kar raha hai Boss ✨",
+        "All tools and models operational, Boss!",
+        "Jenna AI native companion alive on Android 15 ✨",
     ]
     return random.choice(dialogues)
 

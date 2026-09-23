@@ -137,11 +137,13 @@ async def alert(key: str, title: str, notif_body: str, wa_prompt: str,
 # ---------------------------------------------------------------------------
 # ADB helpers
 # ---------------------------------------------------------------------------
+ADB_DEVICE = os.getenv("ADB_DEVICE", "127.0.0.1:5555")
+
 def _adb(args: list[str]) -> str:
     """Run an adb command and return stdout (empty string on error)."""
     try:
         result = subprocess.run(
-            ["adb", "shell"] + args,
+            ["adb", "-s", ADB_DEVICE, "shell"] + args,
             capture_output=True, text=True, timeout=10,
         )
         return result.stdout.strip()
